@@ -6,6 +6,12 @@ public abstract class Item {
     private float y;
     private float angle;
 
+    public Item(float x, float y, float angle) {
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+    }
+
     public float getX() {
         return x;
     }
