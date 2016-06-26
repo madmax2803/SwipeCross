@@ -1,15 +1,21 @@
-package com.swapnil.leveleditor.Units;
+package com.swapnil.leveleditor.util;
 
-public abstract class Item {
-
+/**
+ * Generic utility class for storing 2d point
+ * Created by swapnilverma on 22/06/16.
+ */
+public class Point {
     private float x;
     private float y;
-    private float angle;
 
-    public Item(float x, float y, float angle) {
+    public Point() {
+        x=0;
+        y=0;
+    }
+
+    public Point(float x, float y) {
         this.x = x;
         this.y = y;
-        this.angle = angle;
     }
 
     public float getX() {
@@ -28,11 +34,7 @@ public abstract class Item {
         this.y = y;
     }
 
-    public float getAngle() {
-        return angle;
-    }
-
-    public void setAngle(float angle) {
-        this.angle = angle;
+    public float distanceFrom(Point p){
+        return 0;//TODO formula
     }
 }
