@@ -14,7 +14,7 @@ public class SelectTool extends Tool {
     @Override
     public void onPress(int screenX, int screenY) {
         Array<Item> itemArray = levelEditor.getItemList();
-        Item temp = null;
+        Item temp;
         boolean flag = true;
         for (int i = 0; i < itemArray.size; i++) {
             temp = itemArray.get(i);

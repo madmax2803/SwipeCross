@@ -3,8 +3,6 @@ package com.swapnil.leveleditor;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -76,16 +74,13 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 				itemName = element.getChild(i).getName();
 				switch (itemName) {
 					case "Player":
-						Player player = new Player().loadFromXml(element.getChild(i));
-						stage.addActor(player.getActor());
+						addToStage(new Player().loadFromXml(element.getChild(i)));
 						break;
 					case "Destination":
-						Destination destination = new Destination().loadFromXml(element.getChild(i));
-						stage.addActor(destination.getActor());
+						addToStage(new Destination().loadFromXml(element.getChild(i)));
 						break;
 					case "Wall":
-						Wall wall = new Wall().loadFromXml(element.getChild(i));
-						stage.addActor(wall.getActor());
+						addToStage(new Wall().loadFromXml(element.getChild(i)));
 						break;
 				}
 			}
@@ -98,6 +93,10 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 
 	public void setActiveTool(Tool tool) {
 		activeTool = tool;
+	}
+
+	public Table getMenu() {
+		return menu;
 	}
 
 	@Override

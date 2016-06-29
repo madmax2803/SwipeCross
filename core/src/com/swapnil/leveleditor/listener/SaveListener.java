@@ -1,6 +1,5 @@
 package com.swapnil.leveleditor.listener;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
@@ -21,12 +20,10 @@ public class SaveListener extends ChangeListener {
 
     @Override
     public void changed(ChangeEvent event, Actor actor) {
-        Gdx.app.log("debug","Saving to xml");
         Array<Item> itemArray = levelEditor.getItemList();
-        Item item = null;
+        Item item;
         StringWriter stringWriter = new StringWriter();
         XmlWriter xmlWriter = new XmlWriter(stringWriter);
-        XmlWriter temp = new XmlWriter(stringWriter);
         try {
             xmlWriter = xmlWriter.element("Root");
         }catch(Exception e) {
@@ -42,6 +39,7 @@ public class SaveListener extends ChangeListener {
             e.printStackTrace();
         }
         levelEditor.getHandle().writeString(stringWriter.toString(), false);
+        levelEditor.getMenu().setVisible(false);
     }
 
 }
