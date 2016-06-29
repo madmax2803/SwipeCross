@@ -1,7 +1,8 @@
 package com.swapnil.leveleditor.item;
 
-import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlWriter;
 
 public abstract class Item {
 
@@ -11,13 +12,8 @@ public abstract class Item {
     protected Actor actor=new Actor();
 
     public Item() {
+
     }
-
-//    @Override
-//    public void draw(Batch batch, float parentAlpha) {
-//        super.draw(batch, parentAlpha);
-//    }
-
 
     public Actor getActor() {
         return actor;
@@ -48,4 +44,8 @@ public abstract class Item {
     }
 
     public abstract boolean contains(int screenX, int screenY);
+
+    public abstract void writeToXml(XmlWriter xmlWriter);
+
+    public abstract Item loadFromXml(XmlReader.Element element);
 }

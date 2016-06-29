@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.XmlReader;
+import com.badlogic.gdx.utils.XmlWriter;
 import com.swapnil.leveleditor.util.Point;
 
 public class Guard extends Item {
@@ -27,5 +29,15 @@ public class Guard extends Item {
     @Override
     public boolean contains(int screenX, int screenY) {
         return false;
+    }
+
+    @Override
+    public void writeToXml(XmlWriter xmlWriter) {
+
+    }
+
+    @Override
+    public Item loadFromXml(XmlReader.Element element) {
+        return null;
     }
 }

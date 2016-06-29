@@ -1,7 +1,10 @@
 package com.swapnil.leveleditor;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -9,11 +12,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.XmlReader;
 import com.swapnil.leveleditor.item.*;
+import com.swapnil.leveleditor.listener.SaveListener;
 import com.swapnil.leveleditor.tool.DeleteTool;
 import com.swapnil.leveleditor.tool.ItemTool;
 import com.swapnil.leveleditor.tool.SelectTool;
 import com.swapnil.leveleditor.tool.Tool;
+
+import java.io.IOException;
 
 public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 
@@ -43,7 +50,11 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 	private SelectTool selectTool;
 	private DeleteTool deleteTool;
 	private ItemTool playerTool, wallTool, destinationTool;
+	private FileHandle handle = new FileHandle("LevelLayout.xml");
 
+	public FileHandle getHandle() {
+		return handle;
+	}
 
 	public LevelEditor() {
 
@@ -57,6 +68,34 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 
 	}
 
+	private void layoutSetup() {
+		String itemName;
+		try{
+			XmlReader.Element element = new XmlReader().parse(handle);
+			for(int i=0;i<element.getChildCount();i++) {
+				itemName = element.getChild(i).getName();
+				switch (itemName) {
+					case "Player":
+						Player player = new Player().loadFromXml(element.getChild(i));
+						stage.addActor(player.getActor());
+						break;
+					case "Destination":
+						Destination destination = new Destination().loadFromXml(element.getChild(i));
+						stage.addActor(destination.getActor());
+						break;
+					case "Wall":
+						Wall wall = new Wall().loadFromXml(element.getChild(i));
+						stage.addActor(wall.getActor());
+						break;
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+
 	public void setActiveTool(Tool tool) {
 		activeTool = tool;
 	}
@@ -68,6 +107,10 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 
 		stage = new Stage();
 
+		if(handle.exists()) {
+			layoutSetup();
+		}
+
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("UI/atlas.pack"));
 		Skin skin = new Skin(Gdx.files.internal("Skins/MenuSkin.json"), atlas);
 
@@ -76,6 +119,7 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 		TextButton player = new TextButton("Player", skin);
 		TextButton wall = new TextButton("Wall", skin);
 		TextButton destination = new TextButton("Destination", skin);
+		TextButton save = new TextButton("Save", skin);
 
 
 		menu = new Table(skin);
@@ -84,6 +128,7 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 		menu.add(player).width(destination.getWidth()).height(destination.getHeight()).row();
 		menu.add(destination).width(destination.getWidth()).height(destination.getHeight()).row();
 		menu.add(wall).width(destination.getWidth()).height(destination.getHeight()).row();
+		menu.add(save).width(destination.getWidth()).height(destination.getHeight()).row();
 		menu.pack();
 
 		menu.setVisible(false);
@@ -91,7 +136,7 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 		select.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-
+				Gdx.app.log("debug","selection tool");
 				setActiveTool(selectTool);
 				menu.setVisible(false);
 			}
@@ -124,6 +169,7 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 				menu.setVisible(false);
 			}
 		});
+		save.addListener(new SaveListener(this));
 
 		stage.addActor(menu);
 
@@ -182,14 +228,12 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 
 		if (button == Input.Buttons.RIGHT) {
 
-//			Gdx.app.log("RIGHT CLICK", "Right mouse button pressed");
 			menu.setX((float) screenX);
 			menu.setY(Gdx.graphics.getHeight() - screenY - menu.getHeight());
 			menu.setVisible(true);
 
 		} else if (button == Input.Buttons.LEFT) {
 
-//			Gdx.app.log("LEFT CLICK", "Left mouse button pressed");
 			menu.setVisible(false);
 			activeTool.onPress(screenX, screenY);
 
@@ -200,13 +244,11 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-//		Gdx.app.log("RELEASE", "Mouse button released");
 		return false;
 	}
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-//		Gdx.app.log("MOUSE DRAG", "Mouse dragged");
 		selectedItem.setX(screenX);
 		selectedItem.setY(screenY);
 		return false;
