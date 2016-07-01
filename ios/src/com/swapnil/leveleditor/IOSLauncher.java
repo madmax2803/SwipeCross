@@ -5,13 +5,13 @@ import org.robovm.apple.uikit.UIApplication;
 
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import com.swapnil.leveleditor.LevelEditor;
+import com.swapnil.leveleditor.screens.LevelEditor;
 
 public class IOSLauncher extends IOSApplication.Delegate {
     @Override
     protected IOSApplication createApplication() {
         IOSApplicationConfiguration config = new IOSApplicationConfiguration();
-        return new IOSApplication(new LevelEditor(), config);
+        return new IOSApplication(new LevelEditor(this), config);
     }
 
     public static void main(String[] argv) {

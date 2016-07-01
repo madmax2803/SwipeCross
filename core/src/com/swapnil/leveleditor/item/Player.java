@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.utils.XmlWriter;
 public class Player extends Item {
 
     private Sprite sprite;
+    private Body body;
 
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;
@@ -23,7 +25,13 @@ public class Player extends Item {
             @Override
             public void draw(Batch batch, float parentAlpha) {
                 super.draw(batch, parentAlpha);
-                sprite.setPosition(x - sprite.getWidth()/2, Gdx.graphics.getHeight() -  y - sprite.getHeight()/2);
+                if (body!=null) {
+                    sprite.setPosition(body.getPosition().x - sprite.getWidth()/2,
+                            Gdx.graphics.getHeight() -  body.getPosition().y - sprite.getHeight()/2);
+                }else{
+                    sprite.setPosition(x - sprite.getWidth()/2,
+                            Gdx.graphics.getHeight() -  y - sprite.getHeight()/2);
+                }
                 sprite.draw(batch);
                 actor.setX(x - sprite.getWidth()/2);
                 actor.setY(Gdx.graphics.getHeight() - y - sprite.getHeight()/2);
@@ -60,5 +68,25 @@ public class Player extends Item {
         player.setX(element.getChildByName("Position").getFloat("X"));
         player.setY(element.getChildByName("Position").getFloat("Y"));
         return player;
+    }
+
+    @Override
+    public void createBody(World world) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(x, y);
+
+        body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(sprite.getWidth()/2, sprite.getHeight()/2);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.restitution = 0.5f;
+        fixtureDef.density = 0.1f;
+        body.createFixture(fixtureDef);
+
+        shape.dispose();
     }
 }

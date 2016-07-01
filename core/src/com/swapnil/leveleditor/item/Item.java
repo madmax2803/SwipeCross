@@ -1,5 +1,6 @@
 package com.swapnil.leveleditor.item;
 
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
@@ -48,4 +49,6 @@ public abstract class Item {
     public abstract void writeToXml(XmlWriter xmlWriter);
 
     public abstract Item loadFromXml(XmlReader.Element element);
+
+    public abstract void createBody(World world);
 }

@@ -2,7 +2,7 @@ package com.swapnil.leveleditor.tool;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.swapnil.leveleditor.LevelEditor;
+import com.swapnil.leveleditor.screens.LevelEditor;
 import com.swapnil.leveleditor.item.Item;
 
 public class DeleteTool extends Tool  {

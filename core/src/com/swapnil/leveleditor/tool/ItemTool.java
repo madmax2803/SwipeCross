@@ -2,7 +2,7 @@ package com.swapnil.leveleditor.tool;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.swapnil.leveleditor.LevelEditor;
+import com.swapnil.leveleditor.screens.LevelEditor;
 import com.swapnil.leveleditor.item.*;
 
 public class ItemTool extends Tool {

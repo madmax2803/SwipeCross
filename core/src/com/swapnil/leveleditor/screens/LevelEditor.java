@@ -1,4 +1,4 @@
-package com.swapnil.leveleditor;
+package com.swapnil.leveleditor.screens;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
+import com.swapnil.leveleditor.SwipeCross;
 import com.swapnil.leveleditor.item.*;
 import com.swapnil.leveleditor.listener.SaveListener;
 import com.swapnil.leveleditor.tool.DeleteTool;
@@ -20,9 +21,11 @@ import com.swapnil.leveleditor.tool.Tool;
 
 import java.io.IOException;
 
-public class LevelEditor extends ApplicationAdapter implements InputProcessor {
+public class LevelEditor extends Game implements InputProcessor, Screen {
 
 	private Stage stage;
+	private String levelFile;
+	private SwipeCross game;
 
 	public void setDrawSelectionRectangle(boolean drawSelectionRectangle) {
 		this.drawSelectionRectangle = drawSelectionRectangle;
@@ -48,14 +51,18 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 	private SelectTool selectTool;
 	private DeleteTool deleteTool;
 	private ItemTool playerTool, wallTool, destinationTool;
-	private FileHandle handle = new FileHandle("LevelLayout.xml");
+	private FileHandle handle;
+
 
 	public FileHandle getHandle() {
 		return handle;
 	}
 
-	public LevelEditor() {
+	public LevelEditor(String levelFile,SwipeCross game) {
+		this.levelFile = levelFile;
+		this.game = game;
 
+		handle = new FileHandle(levelFile);
 		selectTool = new SelectTool(this);
 		deleteTool = new DeleteTool(this);
 		wallTool = new ItemTool(this, ItemType.WALL);
@@ -63,6 +70,8 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 		destinationTool = new ItemTool(this, ItemType.DESTINATION);
 
 		activeTool = selectTool;
+
+		init();
 
 	}
 
@@ -102,13 +111,17 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 	@Override
 	public void create() {
 
-		new LevelEditor();
 
+	}
+
+	private void init() {
 		stage = new Stage();
 
 		if(handle.exists()) {
 			layoutSetup();
 		}
+
+//		setScreen(new PlayScreen("LevelLayout.xml"));
 
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("UI/atlas.pack"));
 		Skin skin = new Skin(Gdx.files.internal("Skins/MenuSkin.json"), atlas);
@@ -119,7 +132,6 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 		TextButton wall = new TextButton("Wall", skin);
 		TextButton destination = new TextButton("Destination", skin);
 		TextButton save = new TextButton("Save", skin);
-
 
 		menu = new Table(skin);
 		menu.add(select).width(destination.getWidth()).height(destination.getHeight()).row();
@@ -170,35 +182,23 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 		});
 		save.addListener(new SaveListener(this));
 
+		TextButton play = new TextButton("Play", skin);
+		play.setPosition(Gdx.graphics.getWidth() - play.getWidth(), Gdx.graphics.getHeight() - play.getHeight());
+		play.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				game.setScreen(new PlayScreen(levelFile,game));
+			}
+		});
+
+
+		stage.addActor(play);
 		stage.addActor(menu);
 
 		InputMultiplexer inputMultiplexer = new InputMultiplexer();
 		inputMultiplexer.addProcessor(stage);
 		inputMultiplexer.addProcessor(this);
 		Gdx.input.setInputProcessor(inputMultiplexer);
-
-	}
-
-	@Override
-	public void render() {
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-		stage.act();
-		stage.setDebugAll(true);
-		stage.draw();
-
-		if(drawSelectionRectangle){
-			ShapeRenderer shapeRenderer = new ShapeRenderer();
-		 	shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-			shapeRenderer.setColor(0f, 0f, 0f, 0.2f);
-			shapeRenderer.rect(selectedItem.getX() - selectedItem.getActor().getWidth()/2 - 5,
-					Gdx.graphics.getHeight() - selectedItem.getY() - selectedItem.getActor().getHeight()/2 - 5,
-					selectedItem.getActor().getWidth() + 10, selectedItem.getActor().getHeight() + 10);
-			shapeRenderer.end();
-
-		}
-
 	}
 
 	public void addToStage(Item item) {
@@ -248,8 +248,10 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		selectedItem.setX(screenX);
-		selectedItem.setY(screenY);
+		if (selectedItem!=null) {
+			selectedItem.setX(screenX);
+			selectedItem.setY(screenY);
+		}
 		return false;
 	}
 
@@ -263,4 +265,34 @@ public class LevelEditor extends ApplicationAdapter implements InputProcessor {
 		return false;
 	}
 
+	@Override
+	public void show() {
+
+	}
+
+	@Override
+	public void hide() {
+
+	}
+
+	@Override
+	public void render(float delta) {
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+		stage.act();
+		stage.setDebugAll(true);
+		stage.draw();
+
+		if (drawSelectionRectangle) {
+			ShapeRenderer shapeRenderer = new ShapeRenderer();
+			shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+			shapeRenderer.setColor(0f, 0f, 0f, 0.2f);
+			shapeRenderer.rect(selectedItem.getX() - selectedItem.getActor().getWidth() / 2 - 5,
+					Gdx.graphics.getHeight() - selectedItem.getY() - selectedItem.getActor().getHeight() / 2 - 5,
+					selectedItem.getActor().getWidth() + 10, selectedItem.getActor().getHeight() + 10);
+			shapeRenderer.end();
+
+		}
+	}
 }

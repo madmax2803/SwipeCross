@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlWriter;
-import com.swapnil.leveleditor.LevelEditor;
+import com.swapnil.leveleditor.screens.LevelEditor;
 import com.swapnil.leveleditor.item.Item;
 
 import java.io.IOException;

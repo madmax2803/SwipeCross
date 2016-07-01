@@ -1,6 +1,6 @@
 package com.swapnil.leveleditor.tool;
 
-import com.swapnil.leveleditor.LevelEditor;
+import com.swapnil.leveleditor.screens.LevelEditor;
 
 
 public abstract class Tool {
