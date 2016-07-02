@@ -51,4 +51,6 @@ public abstract class Item {
     public abstract Item loadFromXml(XmlReader.Element element);
 
     public abstract void createBody(World world);
+
+    public abstract void update();
 }

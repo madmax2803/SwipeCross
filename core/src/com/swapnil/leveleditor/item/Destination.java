@@ -26,9 +26,11 @@ public class Destination extends Item {
                     sprite.setPosition(x - sprite.getWidth()/2,
                             Gdx.graphics.getHeight() -  y - sprite.getHeight()/2);
                 }
+                sprite.setRotation(getAngle());
+                setAngle(sprite.getRotation());
+                update();
                 sprite.draw(batch);
-                actor.setX(x - sprite.getWidth()/2);
-                actor.setY(Gdx.graphics.getHeight() - y - sprite.getHeight()/2);
+
 
             }
         };
@@ -56,6 +58,9 @@ public class Destination extends Item {
                     .attribute("X", sprite.getX() + sprite.getWidth()/2)
                     .attribute("Y", Gdx.graphics.getHeight() - sprite.getY() - sprite.getHeight()/2)
                     .pop()
+                    .element("Angle")
+                    .attribute("Value", sprite.getRotation())
+                    .pop()
                 .pop();
         }
         catch (Exception e) {
@@ -69,13 +74,14 @@ public class Destination extends Item {
         destination.setSprite(new Sprite(new Texture("unitTexture/Destination.png")));
         destination.setX(element.getChildByName("Position").getFloat("X"));
         destination.setY(element.getChildByName("Position").getFloat("Y"));
+        destination.setAngle(element.getChildByName("Angle").getFloat("Value"));
         return destination;
     }
 
     @Override
     public void createBody(World world) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set(x, y);
 
         body = world.createBody(bodyDef);
@@ -90,6 +96,15 @@ public class Destination extends Item {
         body.createFixture(fixtureDef);
 
         shape.dispose();
+    }
+
+    @Override
+    public void update() {
+
+        actor.setX(getX());
+        actor.setY(getY());
+        actor.setRotation(getAngle());
+
     }
 
 }

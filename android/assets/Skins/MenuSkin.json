@@ -19,6 +19,10 @@
     "default" : { "up" : "button.up" , "down" : "button.down" , "font" : myfont , "fontColor" : black , "pressedOffsetX" : 1 , "pressedOffsetY" : -1 }
   },
 
+  "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle" : {
+    "default" : { "font" : myfont , "fontColor" : black }
+  },
+
   "com.badlogic.gdx.scenes.scene2d.ui.List$ListStyle" : {
     "default" : { "font" : myfont , "fontColorUnselected" : white , "fontColorSelected" : black , "selection" : "default.selection" }
   },

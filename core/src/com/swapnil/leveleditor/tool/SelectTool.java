@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.swapnil.leveleditor.screens.LevelEditor;
 import com.swapnil.leveleditor.item.Item;
+import com.swapnil.leveleditor.util.Point;
 
 public class SelectTool extends Tool {
 
@@ -21,6 +22,9 @@ public class SelectTool extends Tool {
             if (temp.contains(screenX, Gdx.graphics.getHeight() -  screenY)) {
                 flag = true;
                 levelEditor.setSelectedItem(temp);
+                levelEditor.getCommonMenu().getMenu().setVisible(true);
+                levelEditor.getCommonMenu().setDefaults(new Point(levelEditor.getSelectedItem().getX(),
+                        levelEditor.getSelectedItem().getY()), levelEditor.selectedItem.getAngle());
                 break;
             }
             else {
@@ -29,6 +33,7 @@ public class SelectTool extends Tool {
         }
         if(!flag) {
             levelEditor.selectedItem = null;
+            levelEditor.getCommonMenu().getMenu().setVisible(false);
             levelEditor.setDrawSelectionRectangle(false);
         }
     }

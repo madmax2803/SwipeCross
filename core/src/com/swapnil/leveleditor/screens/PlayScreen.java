@@ -1,15 +1,18 @@
 package com.swapnil.leveleditor.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.swapnil.leveleditor.SwipeCross;
@@ -21,14 +24,17 @@ import com.swapnil.leveleditor.util.Boundary;
 
 import java.io.IOException;
 
-public class PlayScreen implements Screen {
+public class PlayScreen implements Screen, InputProcessor {
 
     private Array<Item> itemList = new Array<>();
     private Stage stage;
     private World world;
+    private String levelFile;
     private SwipeCross game;
 
     public PlayScreen(String levelFile, SwipeCross game) {
+
+        this.levelFile = levelFile;
         this.game = game;
 
         stage = new Stage();
@@ -60,22 +66,33 @@ public class PlayScreen implements Screen {
 
     @Override
     public void show() {
+        init();
+        Gdx.input.setInputProcessor(stage);
+    }
 
+    private void init() {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("UI/atlas.pack"));
         Skin skin = new Skin(Gdx.files.internal("Skins/MenuSkin.json"), atlas);
 
-        world = new World(new Vector2(0f, 100f), true);
+        world = new World(new Vector2(0f, 1000f), true);
 
         new Boundary(world);
 
         TextButton editor = new TextButton("Editor", skin);
-        editor.setPosition(Gdx.graphics.getWidth() - editor.getWidth(), Gdx.graphics.getHeight() - editor.getHeight());
+        editor.setPosition(0, Gdx.graphics.getHeight() - editor.getHeight());
+        editor.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                game.setScreen(new LevelEditor(levelFile, game));
+            }
+        });
 
         for(int i=0;i<itemList.size;i++) {
             itemList.get(i).createBody(world);
         }
 
         stage.addActor(editor);
+
     }
 
     @Override
@@ -86,7 +103,6 @@ public class PlayScreen implements Screen {
         world.step(1f/60f, 6, 2);
 
         stage.act();
-        stage.setDebugAll(true);
         stage.draw();
     }
 
@@ -118,5 +134,45 @@ public class PlayScreen implements Screen {
     private void addToStage(Item item) {
         itemList.add(item);
         stage.addActor(item.getActor());
+    }
+
+    @Override
+    public boolean keyDown(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(int amount) {
+        return false;
     }
 }

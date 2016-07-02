@@ -21,6 +21,10 @@ public class Wall extends Item{
         this.sprite = sprite;
         actor.setWidth(this.sprite.getWidth());
         actor.setHeight(this.sprite.getHeight());
+        setX(sprite.getX());
+        setY(sprite.getY());
+        setAngle(sprite.getRotation());
+
     }
 
     public float getLength() {
@@ -50,9 +54,12 @@ public class Wall extends Item{
                 }else{
                     sprite.setPosition(x - sprite.getWidth()/2,
                             Gdx.graphics.getHeight() -  y - sprite.getHeight()/2);
-                }                sprite.draw(batch);
-                actor.setX(x - sprite.getWidth()/2);
-                actor.setY(Gdx.graphics.getHeight() - y - sprite.getHeight()/2);
+                }
+                sprite.setRotation(getAngle());
+                setAngle(sprite.getRotation());
+                update();
+                sprite.draw(batch);
+
             }
         };
     }
@@ -72,6 +79,9 @@ public class Wall extends Item{
                     .attribute("X", sprite.getX() + sprite.getWidth())
                     .attribute("Y", Gdx.graphics.getHeight() - sprite.getY() - sprite.getHeight()/2)
                     .pop()
+                    .element("Angle")
+                    .attribute("Value", sprite.getRotation())
+                    .pop()
                     .pop();
         }
         catch (Exception e) {
@@ -85,13 +95,14 @@ public class Wall extends Item{
         wall.setSprite(new Sprite(new Texture("unitTexture/Wall.png")));
         wall.setX(element.getChildByName("Position").getFloat("X"));
         wall.setY(element.getChildByName("Position").getFloat("Y"));
+        wall.setAngle(element.getChildByName("Angle").getFloat("Value"));
         return wall;
     }
 
     @Override
     public void createBody(World world) {
         BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.type = BodyDef.BodyType.StaticBody;
         bodyDef.position.set(x, y);
 
         body = world.createBody(bodyDef);
@@ -106,5 +117,15 @@ public class Wall extends Item{
         body.createFixture(fixtureDef);
 
         shape.dispose();
+    }
+
+    @Override
+    public void update() {
+
+        actor.setX(getX());
+        actor.setY(getY());
+        actor.setRotation(getAngle());
+
+
     }
 }

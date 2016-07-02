@@ -18,6 +18,9 @@ public class Player extends Item {
         this.sprite = sprite;
         actor.setWidth(this.sprite.getWidth());
         actor.setHeight(this.sprite.getHeight());
+        setX(sprite.getX());
+        setY(sprite.getY());
+        setAngle(sprite.getRotation());
     }
 
     public Player() {
@@ -32,9 +35,10 @@ public class Player extends Item {
                     sprite.setPosition(x - sprite.getWidth()/2,
                             Gdx.graphics.getHeight() -  y - sprite.getHeight()/2);
                 }
+                sprite.setRotation(getAngle());
+                setAngle(sprite.getRotation());
+                update();
                 sprite.draw(batch);
-                actor.setX(x - sprite.getWidth()/2);
-                actor.setY(Gdx.graphics.getHeight() - y - sprite.getHeight()/2);
             }
         };
     }
@@ -54,6 +58,9 @@ public class Player extends Item {
                     .attribute("X", sprite.getX() + sprite.getWidth()/2)
                     .attribute("Y", Gdx.graphics.getHeight() - sprite.getY() - sprite.getHeight()/2)
                     .pop()
+                    .element("Angle")
+                    .attribute("Value", sprite.getRotation())
+                    .pop()
                     .pop();
         }
         catch (Exception e) {
@@ -67,6 +74,7 @@ public class Player extends Item {
         player.setSprite(new Sprite(new Texture(Gdx.files.internal("unitTexture/Player.png"))));
         player.setX(element.getChildByName("Position").getFloat("X"));
         player.setY(element.getChildByName("Position").getFloat("Y"));
+        player.setAngle(element.getChildByName("Angle").getFloat("Value"));
         return player;
     }
 
@@ -88,5 +96,15 @@ public class Player extends Item {
         body.createFixture(fixtureDef);
 
         shape.dispose();
+    }
+
+    @Override
+    public void update() {
+
+        actor.setX(getX());
+        actor.setY(getY());
+        actor.setRotation(getAngle());
+
+
     }
 }

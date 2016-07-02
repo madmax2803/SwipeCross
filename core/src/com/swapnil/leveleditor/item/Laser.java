@@ -26,4 +26,11 @@ public class Laser extends Item {
     public void createBody(World world) {
 
     }
+
+    @Override
+    public void update() {
+
+    }
+
+
 }

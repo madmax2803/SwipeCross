@@ -2,10 +2,15 @@ package com.swapnil.leveleditor.screens;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -18,41 +23,55 @@ import com.swapnil.leveleditor.tool.DeleteTool;
 import com.swapnil.leveleditor.tool.ItemTool;
 import com.swapnil.leveleditor.tool.SelectTool;
 import com.swapnil.leveleditor.tool.Tool;
+import com.swapnil.leveleditor.util.CommonMenu;
+import com.swapnil.leveleditor.util.Point;
 
 import java.io.IOException;
 
-public class LevelEditor extends Game implements InputProcessor, Screen {
+public class LevelEditor implements InputProcessor, Screen {
 
 	private Stage stage;
+
 	private String levelFile;
 	private SwipeCross game;
+	private boolean drawSelectionRectangle = false;
+
+	private Array<Item> itemList = new Array<>();
+
+	public Item selectedItem = null;
+
+	private Table menu;
+
+	private SelectTool selectTool;
+
+	private DeleteTool deleteTool;
+	private ItemTool playerTool, wallTool, destinationTool;
+	private Tool activeTool;
+	private FileHandle handle;
+
+	private CommonMenu commonMenu;
+
+	public Item getSelectedItem() {
+		return selectedItem;
+	}
+
+	public CommonMenu getCommonMenu() {
+		return commonMenu;
+	}
 
 	public void setDrawSelectionRectangle(boolean drawSelectionRectangle) {
 		this.drawSelectionRectangle = drawSelectionRectangle;
 	}
 
-	private boolean drawSelectionRectangle = false;
 	public Array<Item> getItemList() {
 		return itemList;
 	}
 
-	private Array<Item> itemList = new Array<>();
-	private Tool activeTool;
-
 	public void setSelectedItem(Item selectedItem) {
 		this.selectedItem = selectedItem;
-		this.selectedItem.getActor();
 		drawSelectionRectangle = true;
 
 	}
-
-	public Item selectedItem = null;
-	private Table menu;
-	private SelectTool selectTool;
-	private DeleteTool deleteTool;
-	private ItemTool playerTool, wallTool, destinationTool;
-	private FileHandle handle;
-
 
 	public FileHandle getHandle() {
 		return handle;
@@ -108,12 +127,6 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 		return menu;
 	}
 
-	@Override
-	public void create() {
-
-
-	}
-
 	private void init() {
 		stage = new Stage();
 
@@ -121,10 +134,11 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 			layoutSetup();
 		}
 
-//		setScreen(new PlayScreen("LevelLayout.xml"));
-
 		TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("UI/atlas.pack"));
 		Skin skin = new Skin(Gdx.files.internal("Skins/MenuSkin.json"), atlas);
+
+		commonMenu = new CommonMenu(this);
+		commonMenu.getMenu().setVisible(false);
 
 		TextButton select = new TextButton("Select", skin);
 		TextButton delete = new TextButton("Delete", skin);
@@ -147,7 +161,6 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 		select.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				Gdx.app.log("debug","selection tool");
 				setActiveTool(selectTool);
 				menu.setVisible(false);
 			}
@@ -183,7 +196,7 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 		save.addListener(new SaveListener(this));
 
 		TextButton play = new TextButton("Play", skin);
-		play.setPosition(Gdx.graphics.getWidth() - play.getWidth(), Gdx.graphics.getHeight() - play.getHeight());
+		play.setPosition(0, Gdx.graphics.getHeight() - play.getHeight());
 		play.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -194,6 +207,13 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 
 		stage.addActor(play);
 		stage.addActor(menu);
+		stage.addActor(commonMenu.getMenu());
+
+		stage.getRoot().addCaptureListener(new InputListener() {
+			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
+				if (!(event.getTarget() instanceof TextField)) stage.setKeyboardFocus(null);
+				return false;
+			}});
 
 		InputMultiplexer inputMultiplexer = new InputMultiplexer();
 		inputMultiplexer.addProcessor(stage);
@@ -205,10 +225,34 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 
 		itemList.add(item);
 		stage.addActor(item.getActor());
+
 	}
 
 	@Override
 	public boolean keyDown(int keycode) {
+		if(selectedItem!=null){
+			switch (keycode) {
+				case Input.Keys.UP:
+					selectedItem.setY(selectedItem.getY()-1);
+					commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
+					break;
+				case Input.Keys.DOWN:
+					selectedItem.setY(selectedItem.getY()+1);
+					commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
+					break;
+				case Input.Keys.RIGHT:
+					selectedItem.setX(selectedItem.getX()+1);
+					commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
+					break;
+				case Input.Keys.LEFT:
+					selectedItem.setX(selectedItem.getX()-1);
+					commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
+					break;
+				case Input.Keys.ENTER:
+					stage.setKeyboardFocus(null);
+					break;
+			}
+		}
 		return false;
 	}
 
@@ -251,6 +295,7 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 		if (selectedItem!=null) {
 			selectedItem.setX(screenX);
 			selectedItem.setY(screenY);
+			commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
 		}
 		return false;
 	}
@@ -262,6 +307,11 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 
 	@Override
 	public boolean scrolled(int amount) {
+		if(amount == 1)
+			selectedItem.setAngle(selectedItem.getAngle()+1);
+		else if(amount == -1)
+			selectedItem.setAngle(selectedItem.getAngle()-1);
+		commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
 		return false;
 	}
 
@@ -276,23 +326,45 @@ public class LevelEditor extends Game implements InputProcessor, Screen {
 	}
 
 	@Override
+	public void dispose() {
+		stage.dispose();
+		game.dispose();
+	}
+
+	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		Gdx.gl.glEnable(GL20.GL_BLEND);
 
 		stage.act();
-		stage.setDebugAll(true);
 		stage.draw();
 
 		if (drawSelectionRectangle) {
 			ShapeRenderer shapeRenderer = new ShapeRenderer();
-			shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-			shapeRenderer.setColor(0f, 0f, 0f, 0.2f);
-			shapeRenderer.rect(selectedItem.getX() - selectedItem.getActor().getWidth() / 2 - 5,
-					Gdx.graphics.getHeight() - selectedItem.getY() - selectedItem.getActor().getHeight() / 2 - 5,
+			shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+			shapeRenderer.setColor(new Color(0f, 0f, 0f, 0.2f));
+			shapeRenderer.translate(selectedItem.getX(),Gdx.graphics.getHeight() - selectedItem.getY(), 0);
+			shapeRenderer.rotate(0f, 0f, 1f, selectedItem.getAngle());
+			shapeRenderer.rect(0f - selectedItem.getActor().getWidth()/2 - 5, 0f - selectedItem.getActor().getHeight()/2 - 5,
 					selectedItem.getActor().getWidth() + 10, selectedItem.getActor().getHeight() + 10);
 			shapeRenderer.end();
 
 		}
+	}
+
+	@Override
+	public void resize(int width, int height) {
+
+	}
+
+	@Override
+	public void pause() {
+
+	}
+
+	@Override
+	public void resume() {
+
 	}
 }

@@ -46,4 +46,19 @@ public class Guard extends Item {
     public void createBody(World world) {
 
     }
+
+    @Override
+    public void update() {
+
+        setX(sprite.getX() - sprite.getWidth()/2);
+        setY(Gdx.graphics.getHeight() - sprite.getY() - sprite.getHeight()/2);
+        setAngle(sprite.getRotation());
+
+        actor.setX(getX());
+        actor.setY(getY());
+        actor.setRotation(getAngle());
+
+
+    }
+
 }
