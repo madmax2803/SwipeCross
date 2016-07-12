@@ -4,36 +4,22 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
-
-import java.io.StringWriter;
+import com.swapnil.leveleditor.util.WallForm;
 
 public class Wall extends Item{
 
     private Sprite sprite;
-    private float length, width;
+
+    private float width, height;
     private Body body;
 
-    public void setSprite(Sprite sprite) {
-        this.sprite = sprite;
-        actor.setWidth(this.sprite.getWidth());
-        actor.setHeight(this.sprite.getHeight());
-        setX(sprite.getX());
-        setY(sprite.getY());
-        setAngle(sprite.getRotation());
-
-    }
-
-    public float getLength() {
-        return length;
-    }
-
-    public void setLength(float length) {
-        this.length = length;
-    }
+    private WallForm wallForm;
 
     public float getWidth() {
         return width;
@@ -43,31 +29,45 @@ public class Wall extends Item{
         this.width = width;
     }
 
+    public float getHeight() {
+        return height;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    public void setSprite(Sprite sprite) {
+        this.sprite = sprite;
+
+        setAngle(sprite.getRotation());
+
+        setWidth(this.sprite.getWidth());
+        setHeight(this.sprite.getHeight());
+        this.wallForm.setDefaults(getWidth(), getHeight());
+
+    }
+
     public Wall() {
         this.actor = new Actor() {
             @Override
             public void draw(Batch batch, float parentAlpha) {
                 super.draw(batch, parentAlpha);
-                if (body!=null) {
-                    sprite.setPosition(body.getPosition().x - sprite.getWidth()/2,
-                            Gdx.graphics.getHeight() -  body.getPosition().y - sprite.getHeight()/2);
-                }else{
-                    sprite.setPosition(x - sprite.getWidth()/2,
-                            Gdx.graphics.getHeight() -  y - sprite.getHeight()/2);
-                }
-                sprite.setRotation(getAngle());
-                setAngle(sprite.getRotation());
-                update();
                 sprite.draw(batch);
 
             }
         };
+        wallForm = new WallForm(this);
+        wallForm.getForm().setVisible(false);
+    }
+
+    @Override
+    public Table getForm() {
+        return wallForm.getForm();
     }
 
     @Override
     public boolean contains(int screenX, int screenY) {
-        sprite.setBounds(x - sprite.getWidth()/2,Gdx.graphics.getHeight() - y - sprite.getHeight()/2,
-                sprite.getWidth(), sprite.getHeight());
         return(sprite.getBoundingRectangle().contains(screenX, screenY));
     }
 
@@ -75,13 +75,17 @@ public class Wall extends Item{
     public void writeToXml(XmlWriter xmlWriter) {
         try {
             xmlWriter.element("Wall")
-                    .element("Position")
-                    .attribute("X", sprite.getX() + sprite.getWidth())
-                    .attribute("Y", Gdx.graphics.getHeight() - sprite.getY() - sprite.getHeight()/2)
-                    .pop()
-                    .element("Angle")
-                    .attribute("Value", sprite.getRotation())
-                    .pop()
+                        .element("Position")
+                            .attribute("X", getX())
+                            .attribute("Y", getY())
+                        .pop()
+                        .element("Angle")
+                            .attribute("Value", getAngle())
+                        .pop()
+                        .element("Size")
+                            .attribute("Width", getWidth())
+                            .attribute("Height", getHeight())
+                        .pop()
                     .pop();
         }
         catch (Exception e) {
@@ -96,6 +100,9 @@ public class Wall extends Item{
         wall.setX(element.getChildByName("Position").getFloat("X"));
         wall.setY(element.getChildByName("Position").getFloat("Y"));
         wall.setAngle(element.getChildByName("Angle").getFloat("Value"));
+        wall.setWidth(element.getChildByName("Size").getFloat("Width"));
+        wall.setHeight(element.getChildByName("Size").getFloat("Height"));
+        wall.wallForm.setDefaults(wall.getWidth(), wall.getHeight());
         return wall;
     }
 
@@ -103,12 +110,13 @@ public class Wall extends Item{
     public void createBody(World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(x, y);
+        bodyDef.position.set(getX()/PIXELS_TO_METRES,Gdx.graphics.getHeight()/PIXELS_TO_METRES - getY()/PIXELS_TO_METRES);
+        bodyDef.angle = getAngle() * MathUtils.degRad;
 
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(sprite.getWidth()/2, sprite.getHeight()/2);
+        shape.setAsBox( getWidth()/2/PIXELS_TO_METRES, getHeight()/2/PIXELS_TO_METRES);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -122,10 +130,27 @@ public class Wall extends Item{
     @Override
     public void update() {
 
-        actor.setX(getX());
-        actor.setY(getY());
-        actor.setRotation(getAngle());
+        if (body!=null) {
+            sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - getWidth()/2,
+                    Gdx.graphics.getHeight() -  body.getPosition().y * PIXELS_TO_METRES - getHeight()/2);
+        }else{
+            sprite.setPosition(x - getWidth()/2,
+                    Gdx.graphics.getHeight() -  y - getHeight()/2);
+        }
+        sprite.setRotation(getAngle());
+        sprite.setSize(getWidth(), getHeight());
 
+
+        sprite.setBounds(x - getWidth()/2,Gdx.graphics.getHeight() - y - getHeight()/2,
+                getWidth(), getHeight());
+        sprite.setOriginCenter();
+        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
+
+        actor.setWidth(this.getWidth());
+        actor.setHeight(this.getHeight());
+        actor.setX(getX() - this.getWidth()/2);
+        actor.setY(Gdx.graphics.getHeight() - getY() - this.getHeight()/2);
+        actor.setRotation(getAngle());
 
     }
 }

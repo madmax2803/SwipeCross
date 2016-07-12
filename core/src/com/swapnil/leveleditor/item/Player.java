@@ -4,49 +4,74 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.swapnil.leveleditor.util.Point;
 
 public class Player extends Item {
 
     private Sprite sprite;
     private Body body;
 
-    public void setSprite(Sprite sprite) {
-        this.sprite = sprite;
-        actor.setWidth(this.sprite.getWidth());
-        actor.setHeight(this.sprite.getHeight());
-        setX(sprite.getX());
-        setY(sprite.getY());
-        setAngle(sprite.getRotation());
+    private Point oldPoint;
+    private Point newPoint;
+
+    public Point getNewPoint() {
+        return newPoint;
+    }
+
+    public void setNewPoint(float x, float y) {
+        newPoint = new Point();
+        newPoint.setX(Math.abs(x));
+        newPoint.setY(Math.abs(y));
+    }
+
+    public Point getOldPoint() {
+        return oldPoint;
+    }
+
+    public void setOldPoint(float x, float y) {
+        oldPoint = new Point();
+        oldPoint.setX(Math.abs(x));
+        oldPoint.setY(Math.abs(y));
+    }
+
+    private final float width = new Texture(Gdx.files.internal("unitTexture/Player.png")).getWidth();
+    private final float height = new Texture(Gdx.files.internal("unitTexture/Player.png")).getHeight();
+
+    public Body getBody() {
+        return body;
     }
 
     public Player() {
-        this.actor = new Actor() {
+        this.actor=new Actor(){
             @Override
             public void draw(Batch batch, float parentAlpha) {
                 super.draw(batch, parentAlpha);
-                if (body!=null) {
-                    sprite.setPosition(body.getPosition().x - sprite.getWidth()/2,
-                            Gdx.graphics.getHeight() -  body.getPosition().y - sprite.getHeight()/2);
-                }else{
-                    sprite.setPosition(x - sprite.getWidth()/2,
-                            Gdx.graphics.getHeight() -  y - sprite.getHeight()/2);
-                }
-                sprite.setRotation(getAngle());
-                setAngle(sprite.getRotation());
-                update();
                 sprite.draw(batch);
             }
         };
     }
 
     @Override
+    public Table getForm() {
+        return null;
+    }
+
+    public void setSprite(Sprite sprite) {
+        this.sprite = sprite;
+        setAngle(sprite.getRotation());
+    }
+
+    @Override
     public boolean contains(int screenX, int screenY) {
-        sprite.setBounds(x - sprite.getWidth()/2,Gdx.graphics.getHeight() - y - sprite.getHeight()/2,
+        sprite.setBounds(sprite.getX(),Gdx.graphics.getHeight() -  sprite.getY(),
                 sprite.getWidth(), sprite.getHeight());
+
         return(sprite.getBoundingRectangle().contains(screenX, screenY));
     }
 
@@ -55,23 +80,23 @@ public class Player extends Item {
         try {
             xmlWriter.element("Player")
                     .element("Position")
-                    .attribute("X", sprite.getX() + sprite.getWidth()/2)
-                    .attribute("Y", Gdx.graphics.getHeight() - sprite.getY() - sprite.getHeight()/2)
+                    .attribute("X", getX())
+                    .attribute("Y", getY())
                     .pop()
                     .element("Angle")
-                    .attribute("Value", sprite.getRotation())
+                    .attribute("Value", getAngle())
                     .pop()
                     .pop();
         }
         catch (Exception e) {
-            Gdx.app.log("XML WRITE FAILED", e.getMessage());
+            System.out.println("XML WRITE FAILED");
         }
     }
 
     @Override
     public Player loadFromXml(XmlReader.Element element) {
         Player player = new Player();
-        player.setSprite(new Sprite(new Texture(Gdx.files.internal("unitTexture/Player.png"))));
+        player.setSprite(new Sprite(new Texture("unitTexture/Player.png")));
         player.setX(element.getChildByName("Position").getFloat("X"));
         player.setY(element.getChildByName("Position").getFloat("Y"));
         player.setAngle(element.getChildByName("Angle").getFloat("Value"));
@@ -82,29 +107,45 @@ public class Player extends Item {
     public void createBody(World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(x, y);
+        bodyDef.position.set(x/PIXELS_TO_METRES,Gdx.graphics.getHeight()/PIXELS_TO_METRES -  y/PIXELS_TO_METRES);
+        bodyDef.angle = getAngle() * MathUtils.degRad;
 
         body = world.createBody(bodyDef);
 
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(sprite.getWidth()/2, sprite.getHeight()/2);
+        CircleShape circle = new CircleShape();
+        circle.setRadius(width/2/PIXELS_TO_METRES);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
+        fixtureDef.shape = circle;
         fixtureDef.restitution = 0.5f;
         fixtureDef.density = 0.1f;
         body.createFixture(fixtureDef);
 
-        shape.dispose();
+        circle.dispose();
     }
 
     @Override
     public void update() {
 
-        actor.setX(getX());
-        actor.setY(getY());
+        if (body!=null) {
+            sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
+                    body.getPosition().y * PIXELS_TO_METRES - height/2);
+        }else{
+            sprite.setPosition(x - width/2,
+                    Gdx.graphics.getHeight() -  y - height/2);
+
+        }
+        sprite.setRotation(getAngle());
+
+        sprite.setOriginCenter();
+        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
+
+        actor.setWidth(width);
+        actor.setHeight(height);
+        actor.setX(getX() - width/2);
+        actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
         actor.setRotation(getAngle());
 
-
     }
+
 }

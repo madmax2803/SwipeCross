@@ -4,8 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
 
@@ -14,39 +16,31 @@ public class Destination extends Item {
     private Sprite sprite;
     private Body body;
 
+    private final float width = new Texture(Gdx.files.internal("unitTexture/Destination.png")).getWidth();
+    private final float height = new Texture(Gdx.files.internal("unitTexture/Destination.png")).getHeight();
+
     public Destination() {
         this.actor=new Actor(){
             @Override
             public void draw(Batch batch, float parentAlpha) {
                 super.draw(batch, parentAlpha);
-                if (body!=null) {
-                    sprite.setPosition(body.getPosition().x - sprite.getWidth()/2,
-                            Gdx.graphics.getHeight() -  body.getPosition().y - sprite.getHeight()/2);
-                }else{
-                    sprite.setPosition(x - sprite.getWidth()/2,
-                            Gdx.graphics.getHeight() -  y - sprite.getHeight()/2);
-                }
-                sprite.setRotation(getAngle());
-                setAngle(sprite.getRotation());
-                update();
                 sprite.draw(batch);
-
-
             }
         };
     }
 
+    @Override
+    public Table getForm() {
+        return null;
+    }
+
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;
-        actor.setWidth(sprite.getWidth());
-        actor.setHeight(sprite.getHeight());
+        setAngle(sprite.getRotation());
     }
 
     @Override
     public boolean contains(int screenX, int screenY) {
-        sprite.setBounds(x - sprite.getWidth()/2,Gdx.graphics.getHeight() - y - sprite.getHeight()/2,
-                sprite.getWidth(), sprite.getHeight());
-
         return(sprite.getBoundingRectangle().contains(screenX, screenY));
     }
 
@@ -54,17 +48,17 @@ public class Destination extends Item {
     public void writeToXml(XmlWriter xmlWriter) {
         try {
             xmlWriter.element("Destination")
-                    .element("Position")
-                    .attribute("X", sprite.getX() + sprite.getWidth()/2)
-                    .attribute("Y", Gdx.graphics.getHeight() - sprite.getY() - sprite.getHeight()/2)
-                    .pop()
-                    .element("Angle")
-                    .attribute("Value", sprite.getRotation())
-                    .pop()
-                .pop();
+                        .element("Position")
+                            .attribute("X", getX())
+                            .attribute("Y", getY())
+                        .pop()
+                        .element("Angle")
+                            .attribute("Value", getAngle())
+                        .pop()
+                     .pop();
         }
         catch (Exception e) {
-            Gdx.app.log("XML WRITE FAILED", e.getMessage());
+            System.out.println("XML WRITE FAILED");
         }
     }
 
@@ -82,12 +76,13 @@ public class Destination extends Item {
     public void createBody(World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(x, y);
+        bodyDef.position.set(x/PIXELS_TO_METRES, Gdx.graphics.getHeight()/PIXELS_TO_METRES - y/PIXELS_TO_METRES);
+        bodyDef.angle = getAngle() * MathUtils.degRad;
 
         body = world.createBody(bodyDef);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(sprite.getWidth()/2, sprite.getHeight()/2);
+        shape.setAsBox(width/2/PIXELS_TO_METRES, height/2/PIXELS_TO_METRES);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
@@ -101,8 +96,26 @@ public class Destination extends Item {
     @Override
     public void update() {
 
-        actor.setX(getX());
-        actor.setY(getY());
+        if (body!=null) {
+            sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
+                    Gdx.graphics.getHeight() - body.getPosition().y * PIXELS_TO_METRES - height/2);
+        }else{
+            sprite.setPosition(x - width/2,
+                    Gdx.graphics.getHeight() -  y - height/2);
+
+        }
+        sprite.setRotation(getAngle());
+
+
+        sprite.setBounds(x - width/2,Gdx.graphics.getHeight() -  y - height/2,
+                width, height);
+        sprite.setOriginCenter();
+        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
+
+        actor.setWidth(width);
+        actor.setHeight(height);
+        actor.setX(getX() - width/2);
+        actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
         actor.setRotation(getAngle());
 
     }

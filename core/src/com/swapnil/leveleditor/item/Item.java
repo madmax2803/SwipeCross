@@ -2,6 +2,7 @@ package com.swapnil.leveleditor.item;
 
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
 
@@ -11,10 +12,13 @@ public abstract class Item {
     protected float y;
     private float angle;
     protected Actor actor=new Actor();
+    protected final float PIXELS_TO_METRES = 100f;
 
     public Item() {
 
     }
+
+    public abstract Table getForm();
 
     public Actor getActor() {
         return actor;

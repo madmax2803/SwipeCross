@@ -1,12 +1,15 @@
 package com.swapnil.leveleditor.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -31,6 +34,12 @@ public class PlayScreen implements Screen, InputProcessor {
     private World world;
     private String levelFile;
     private SwipeCross game;
+    private Player player;
+
+    private final float PIXELS_TO_METRES = 100f;
+
+    private Matrix4 matrix4;
+    private Box2DDebugRenderer debugRenderer;
 
     public PlayScreen(String levelFile, SwipeCross game) {
 
@@ -46,7 +55,8 @@ public class PlayScreen implements Screen, InputProcessor {
                 itemName = element.getChild(i).getName();
                 switch (itemName) {
                     case "Player":
-                        addToStage(new Player().loadFromXml(element.getChild(i)));
+                        player = new Player().loadFromXml(element.getChild(i));
+                        addToStage(player);
                         break;
                     case "Destination":
                         addToStage(new Destination().loadFromXml(element.getChild(i)));
@@ -67,16 +77,19 @@ public class PlayScreen implements Screen, InputProcessor {
     @Override
     public void show() {
         init();
-        Gdx.input.setInputProcessor(stage);
+        InputMultiplexer inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(stage);
+        inputMultiplexer.addProcessor(this);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     private void init() {
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("UI/atlas.pack"));
         Skin skin = new Skin(Gdx.files.internal("Skins/MenuSkin.json"), atlas);
 
-        world = new World(new Vector2(0f, 1000f), true);
+        world = new World(new Vector2(0f, 0f), true);
 
-        new Boundary(world);
+        new Boundary(PIXELS_TO_METRES,world);
 
         TextButton editor = new TextButton("Editor", skin);
         editor.setPosition(0, Gdx.graphics.getHeight() - editor.getHeight());
@@ -91,6 +104,9 @@ public class PlayScreen implements Screen, InputProcessor {
             itemList.get(i).createBody(world);
         }
 
+        matrix4 = stage.getBatch().getProjectionMatrix().cpy().scale(PIXELS_TO_METRES, PIXELS_TO_METRES, 0);
+        debugRenderer = new Box2DDebugRenderer();
+
         stage.addActor(editor);
 
     }
@@ -102,8 +118,13 @@ public class PlayScreen implements Screen, InputProcessor {
 
         world.step(1f/60f, 6, 2);
 
+        for(int i= 0;i<itemList.size;i++)
+            itemList.get(i).update();
+
         stage.act();
         stage.draw();
+
+        debugRenderer.render(world, matrix4);
     }
 
     @Override
@@ -153,11 +174,16 @@ public class PlayScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        player.setOldPoint(screenX, screenY);
         return false;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        player.setNewPoint(screenX, screenY);
+
+        player.getBody().applyForceToCenter(-player.getNewPoint().distanceX(player.getOldPoint().getX()),
+                player.getNewPoint().distanceY(player.getOldPoint().getY()), true);
         return false;
     }
 

@@ -2,10 +2,16 @@ package com.swapnil.leveleditor.item;
 
 
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
 
 public class Laser extends Item {
+
+    @Override
+    public Table getForm() {
+        return null;
+    }
 
     @Override
     public boolean contains(int screenX, int screenY) {

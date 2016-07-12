@@ -21,10 +21,16 @@ public class SelectTool extends Tool {
             temp = itemArray.get(i);
             if (temp.contains(screenX, Gdx.graphics.getHeight() -  screenY)) {
                 flag = true;
+                try {
+                    levelEditor.getSelectedItem().getForm().setVisible(false);
+                }catch (NullPointerException e)
+                {
+                    //DO NOTHING
+                }
                 levelEditor.setSelectedItem(temp);
-                levelEditor.getCommonMenu().getMenu().setVisible(true);
                 levelEditor.getCommonMenu().setDefaults(new Point(levelEditor.getSelectedItem().getX(),
                         levelEditor.getSelectedItem().getY()), levelEditor.selectedItem.getAngle());
+                levelEditor.getCommonMenu().getMenu().setVisible(true);
                 break;
             }
             else {
@@ -32,9 +38,15 @@ public class SelectTool extends Tool {
             }
         }
         if(!flag) {
-            levelEditor.selectedItem = null;
-            levelEditor.getCommonMenu().getMenu().setVisible(false);
+            try {
+                levelEditor.getCommonMenu().getMenu().setVisible(false);
+                levelEditor.getSelectedItem().getForm().setVisible(false);
+            } catch (Exception e) {
+                //DO NOTHING
+            }
             levelEditor.setDrawSelectionRectangle(false);
+            levelEditor.selectedItem = null;
+
         }
     }
 

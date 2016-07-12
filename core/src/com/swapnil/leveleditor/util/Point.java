@@ -34,7 +34,11 @@ public class Point {
         this.y = y;
     }
 
-    public float distanceFrom(Point p){
-        return 0;//TODO formula
+    public float distanceX(float x) {
+        return this.x - x;
+    }
+
+    public float distanceY(float y) {
+        return this.y - y;
     }
 }

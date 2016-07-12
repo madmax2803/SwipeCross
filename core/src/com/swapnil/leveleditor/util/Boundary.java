@@ -8,9 +8,9 @@ public class Boundary {
 
     Body lower, left, right, upper;
 
-    public Boundary(World world) {
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight();
+    public Boundary(float PIXELS_TO_METERS, World world) {
+        float w = Gdx.graphics.getWidth()/PIXELS_TO_METERS;
+        float h = Gdx.graphics.getHeight()/PIXELS_TO_METERS;
         BodyDef bodyDef2 = new BodyDef();
         bodyDef2.type = BodyDef.BodyType.StaticBody;
         bodyDef2.position.set(0,0);

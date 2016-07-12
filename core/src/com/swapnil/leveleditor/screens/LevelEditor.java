@@ -4,10 +4,8 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -40,7 +38,7 @@ public class LevelEditor implements InputProcessor, Screen {
 
 	public Item selectedItem = null;
 
-	private Table menu;
+	private Table menu, itemMenu;
 
 	private SelectTool selectTool;
 
@@ -145,18 +143,33 @@ public class LevelEditor implements InputProcessor, Screen {
 		TextButton player = new TextButton("Player", skin);
 		TextButton wall = new TextButton("Wall", skin);
 		TextButton destination = new TextButton("Destination", skin);
+		TextButton guard = new TextButton("Guard", skin);
+		TextButton camera = new TextButton("Camera", skin);
+		TextButton laser = new TextButton("Laser", skin);
 		TextButton save = new TextButton("Save", skin);
 
 		menu = new Table(skin);
 		menu.add(select).width(destination.getWidth()).height(destination.getHeight()).row();
 		menu.add(delete).width(destination.getWidth()).height(destination.getHeight()).row();
-		menu.add(player).width(destination.getWidth()).height(destination.getHeight()).row();
-		menu.add(destination).width(destination.getWidth()).height(destination.getHeight()).row();
-		menu.add(wall).width(destination.getWidth()).height(destination.getHeight()).row();
 		menu.add(save).width(destination.getWidth()).height(destination.getHeight()).row();
 		menu.pack();
 
 		menu.setVisible(false);
+
+		itemMenu = new Table(skin);
+		itemMenu.add(player).width(Gdx.graphics.getWidth()/6);
+		itemMenu.add(destination).width(Gdx.graphics.getWidth()/6);
+		itemMenu.add(wall).width(Gdx.graphics.getWidth()/6);
+		itemMenu.add(guard).width(Gdx.graphics.getWidth()/6);
+		itemMenu.add(camera).width(Gdx.graphics.getWidth()/6);
+		itemMenu.add(laser).width(Gdx.graphics.getWidth()/6);
+		itemMenu.pack();
+
+		itemMenu.setX(0);
+		itemMenu.setY(0);
+
+		itemMenu.setVisible(false);
+
 
 		select.addListener(new ChangeListener() {
 			@Override
@@ -168,6 +181,11 @@ public class LevelEditor implements InputProcessor, Screen {
 		delete.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(selectedItem!=null) {
+					selectedItem = null;
+					drawSelectionRectangle = false;
+				}
+
 				setActiveTool(deleteTool);
 				menu.setVisible(false);
 			}
@@ -175,21 +193,36 @@ public class LevelEditor implements InputProcessor, Screen {
 		player.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(selectedItem!=null) {
+					selectedItem = null;
+					drawSelectionRectangle = false;
+				}
+
 				setActiveTool(playerTool);
-				menu.setVisible(false);
-			}
-		});
-		destination.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				setActiveTool(destinationTool);
 				menu.setVisible(false);
 			}
 		});
 		wall.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
+				if(selectedItem!=null) {
+					selectedItem = null;
+					drawSelectionRectangle = false;
+				}
+
 				setActiveTool(wallTool);
+				menu.setVisible(false);
+			}
+		});
+		destination.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(selectedItem!=null) {
+					selectedItem = null;
+					drawSelectionRectangle = false;
+				}
+
+				setActiveTool(destinationTool);
 				menu.setVisible(false);
 			}
 		});
@@ -207,6 +240,7 @@ public class LevelEditor implements InputProcessor, Screen {
 
 		stage.addActor(play);
 		stage.addActor(menu);
+		stage.addActor(itemMenu);
 		stage.addActor(commonMenu.getMenu());
 
 		stage.getRoot().addCaptureListener(new InputListener() {
@@ -248,11 +282,20 @@ public class LevelEditor implements InputProcessor, Screen {
 					selectedItem.setX(selectedItem.getX()-1);
 					commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
 					break;
-				case Input.Keys.ENTER:
-					stage.setKeyboardFocus(null);
+				case Input.Keys.S:
+					try {
+						stage.addActor(selectedItem.getForm());
+						selectedItem.getForm().setPosition(Gdx.graphics.getWidth() - selectedItem.getForm().getWidth(),
+								Gdx.graphics.getHeight() - commonMenu.getMenu().getHeight() - selectedItem.getForm().getHeight());
+						selectedItem.getForm().setVisible(!selectedItem.getForm().isVisible());
+					}catch (NullPointerException e) {
+						//DO NOTHING
+					}
 					break;
 			}
 		}
+		else if(keycode == Input.Keys.I)
+			itemMenu.setVisible(!itemMenu.isVisible());
 		return false;
 	}
 
@@ -337,7 +380,11 @@ public class LevelEditor implements InputProcessor, Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 
+		for(int i= 0;i<itemList.size;i++)
+			itemList.get(i).update();
+
 		stage.act();
+		stage.setDebugAll(true);
 		stage.draw();
 
 		if (drawSelectionRectangle) {

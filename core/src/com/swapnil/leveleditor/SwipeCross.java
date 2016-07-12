@@ -2,6 +2,7 @@ package com.swapnil.leveleditor;
 
 import com.badlogic.gdx.Game;
 import com.swapnil.leveleditor.screens.LevelEditor;
+import com.swapnil.leveleditor.screens.PlayScreen;
 
 /**
  * Created by swapnilverma on 01/07/16.
