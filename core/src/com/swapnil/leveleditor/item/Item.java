@@ -56,5 +56,7 @@ public abstract class Item {
 
     public abstract void createBody(World world);
 
-    public abstract void update();
+    public abstract void updateEditor();
+
+    public abstract void updatePlay();
 }

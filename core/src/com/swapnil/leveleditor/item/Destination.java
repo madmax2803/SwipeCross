@@ -94,7 +94,7 @@ public class Destination extends Item {
     }
 
     @Override
-    public void update() {
+    public void updateEditor() {
 
         if (body!=null) {
             sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
@@ -117,6 +117,11 @@ public class Destination extends Item {
         actor.setX(getX() - width/2);
         actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
         actor.setRotation(getAngle());
+
+    }
+
+    @Override
+    public void updatePlay() {
 
     }
 

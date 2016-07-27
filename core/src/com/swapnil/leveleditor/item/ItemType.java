@@ -6,5 +6,8 @@ package com.swapnil.leveleditor.item;
 public enum ItemType {
     PLAYER,
     DESTINATION,
-    WALL
+    WALL,
+    CAMERA,
+    GUARD,
+    LASER
 }

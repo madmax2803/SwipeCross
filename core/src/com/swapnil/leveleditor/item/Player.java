@@ -69,7 +69,7 @@ public class Player extends Item {
 
     @Override
     public boolean contains(int screenX, int screenY) {
-        sprite.setBounds(sprite.getX(),Gdx.graphics.getHeight() -  sprite.getY(),
+        sprite.setBounds(sprite.getX(),sprite.getY(),
                 sprite.getWidth(), sprite.getHeight());
 
         return(sprite.getBoundingRectangle().contains(screenX, screenY));
@@ -79,13 +79,13 @@ public class Player extends Item {
     public void writeToXml(XmlWriter xmlWriter) {
         try {
             xmlWriter.element("Player")
-                    .element("Position")
-                    .attribute("X", getX())
-                    .attribute("Y", getY())
-                    .pop()
-                    .element("Angle")
-                    .attribute("Value", getAngle())
-                    .pop()
+                        .element("Position")
+                            .attribute("X", getX())
+                            .attribute("Y", getY())
+                        .pop()
+                        .element("Angle")
+                            .attribute("Value", getAngle())
+                        .pop()
                     .pop();
         }
         catch (Exception e) {
@@ -125,7 +125,7 @@ public class Player extends Item {
     }
 
     @Override
-    public void update() {
+    public void updateEditor() {
 
         if (body!=null) {
             sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
@@ -145,6 +145,11 @@ public class Player extends Item {
         actor.setX(getX() - width/2);
         actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
         actor.setRotation(getAngle());
+
+    }
+
+    @Override
+    public void updatePlay() {
 
     }
 

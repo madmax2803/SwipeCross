@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
-import com.swapnil.leveleditor.util.WallForm;
+import com.swapnil.leveleditor.util.forms.WallForm;
 
 public class Wall extends Item{
 
@@ -128,7 +128,7 @@ public class Wall extends Item{
     }
 
     @Override
-    public void update() {
+    public void updateEditor() {
 
         if (body!=null) {
             sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - getWidth()/2,
@@ -151,6 +151,11 @@ public class Wall extends Item{
         actor.setX(getX() - this.getWidth()/2);
         actor.setY(Gdx.graphics.getHeight() - getY() - this.getHeight()/2);
         actor.setRotation(getAngle());
+
+    }
+
+    @Override
+    public void updatePlay() {
 
     }
 }

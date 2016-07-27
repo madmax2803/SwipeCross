@@ -43,7 +43,7 @@ public class LevelEditor implements InputProcessor, Screen {
 	private SelectTool selectTool;
 
 	private DeleteTool deleteTool;
-	private ItemTool playerTool, wallTool, destinationTool;
+	private ItemTool playerTool, wallTool, destinationTool, cameraTool, laserTool, guardTool;
 	private Tool activeTool;
 	private FileHandle handle;
 
@@ -85,6 +85,9 @@ public class LevelEditor implements InputProcessor, Screen {
 		wallTool = new ItemTool(this, ItemType.WALL);
 		playerTool = new ItemTool(this, ItemType.PLAYER);
 		destinationTool = new ItemTool(this, ItemType.DESTINATION);
+		cameraTool = new ItemTool(this, ItemType.CAMERA);
+		laserTool = new ItemTool(this, ItemType.LASER);
+		guardTool = new ItemTool(this,ItemType.GUARD);
 
 		activeTool = selectTool;
 
@@ -107,6 +110,15 @@ public class LevelEditor implements InputProcessor, Screen {
 						break;
 					case "Wall":
 						addToStage(new Wall().loadFromXml(element.getChild(i)));
+						break;
+					case "Camera":
+						addToStage(new Camera().loadFromXml(element.getChild(i)));
+						break;
+					case "Guard":
+						addToStage(new Guard().loadFromXml(element.getChild(i)));
+						break;
+					case "Laser":
+						addToStage(new Laser().loadFromXml(element.getChild(i)));
 						break;
 				}
 			}
@@ -190,6 +202,7 @@ public class LevelEditor implements InputProcessor, Screen {
 				menu.setVisible(false);
 			}
 		});
+		save.addListener(new SaveListener(this));
 		player.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -200,6 +213,7 @@ public class LevelEditor implements InputProcessor, Screen {
 
 				setActiveTool(playerTool);
 				menu.setVisible(false);
+				itemMenu.setVisible(false);
 			}
 		});
 		wall.addListener(new ChangeListener() {
@@ -212,6 +226,7 @@ public class LevelEditor implements InputProcessor, Screen {
 
 				setActiveTool(wallTool);
 				menu.setVisible(false);
+				itemMenu.setVisible(false);
 			}
 		});
 		destination.addListener(new ChangeListener() {
@@ -224,9 +239,48 @@ public class LevelEditor implements InputProcessor, Screen {
 
 				setActiveTool(destinationTool);
 				menu.setVisible(false);
+				itemMenu.setVisible(false);
 			}
 		});
-		save.addListener(new SaveListener(this));
+		camera.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(selectedItem!=null) {
+					selectedItem = null;
+					drawSelectionRectangle = false;
+				}
+
+				setActiveTool(cameraTool);
+				menu.setVisible(false);
+				itemMenu.setVisible(false);
+			}
+		});
+		laser.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(selectedItem!=null) {
+					selectedItem = null;
+					drawSelectionRectangle = false;
+				}
+
+				setActiveTool(laserTool);
+				menu.setVisible(false);
+				itemMenu.setVisible(false);
+			}
+		});
+		guard.addListener(new ChangeListener() {
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				if(selectedItem!=null) {
+					selectedItem = null;
+					drawSelectionRectangle = false;
+				}
+
+				setActiveTool(guardTool);
+				menu.setVisible(false);
+				itemMenu.setVisible(false);
+			}
+		});
 
 		TextButton play = new TextButton("Play", skin);
 		play.setPosition(0, Gdx.graphics.getHeight() - play.getHeight());
@@ -294,7 +348,7 @@ public class LevelEditor implements InputProcessor, Screen {
 					break;
 			}
 		}
-		else if(keycode == Input.Keys.I)
+		else if(keycode == Input.Keys.SPACE)
 			itemMenu.setVisible(!itemMenu.isVisible());
 		return false;
 	}
@@ -350,11 +404,17 @@ public class LevelEditor implements InputProcessor, Screen {
 
 	@Override
 	public boolean scrolled(int amount) {
-		if(amount == 1)
-			selectedItem.setAngle(selectedItem.getAngle()+1);
-		else if(amount == -1)
-			selectedItem.setAngle(selectedItem.getAngle()-1);
-		commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
+
+		try {
+			if(amount == 1)
+                selectedItem.setAngle(selectedItem.getAngle()+1);
+            else if(amount == -1)
+                selectedItem.setAngle(selectedItem.getAngle()-1);
+			commonMenu.setDefaults(new Point(selectedItem.getX(), selectedItem.getY()), selectedItem.getAngle());
+		} catch (Exception e) {
+			//DO NOTHING
+		}
+
 		return false;
 	}
 
@@ -381,10 +441,9 @@ public class LevelEditor implements InputProcessor, Screen {
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 
 		for(int i= 0;i<itemList.size;i++)
-			itemList.get(i).update();
+			itemList.get(i).updateEditor();
 
 		stage.act();
-		stage.setDebugAll(true);
 		stage.draw();
 
 		if (drawSelectionRectangle) {
@@ -396,6 +455,7 @@ public class LevelEditor implements InputProcessor, Screen {
 			shapeRenderer.rect(0f - selectedItem.getActor().getWidth()/2 - 5, 0f - selectedItem.getActor().getHeight()/2 - 5,
 					selectedItem.getActor().getWidth() + 10, selectedItem.getActor().getHeight() + 10);
 			shapeRenderer.end();
+			shapeRenderer.dispose();
 
 		}
 	}

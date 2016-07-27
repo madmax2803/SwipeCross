@@ -19,10 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.swapnil.leveleditor.SwipeCross;
-import com.swapnil.leveleditor.item.Destination;
-import com.swapnil.leveleditor.item.Item;
-import com.swapnil.leveleditor.item.Player;
-import com.swapnil.leveleditor.item.Wall;
+import com.swapnil.leveleditor.item.*;
 import com.swapnil.leveleditor.util.Boundary;
 
 import java.io.IOException;
@@ -63,6 +60,15 @@ public class PlayScreen implements Screen, InputProcessor {
                         break;
                     case "Wall":
                         addToStage(new Wall().loadFromXml(element.getChild(i)));
+                        break;
+                    case "Camera":
+                        addToStage(new Camera().loadFromXml(element.getChild(i)));
+                        break;
+                    case "Guard":
+                        addToStage(new Guard().loadFromXml(element.getChild(i)));
+                        break;
+                    case "Laser":
+                        addToStage(new Laser().loadFromXml(element.getChild(i)));
                         break;
                 }
             }
@@ -119,7 +125,7 @@ public class PlayScreen implements Screen, InputProcessor {
         world.step(1f/60f, 6, 2);
 
         for(int i= 0;i<itemList.size;i++)
-            itemList.get(i).update();
+            itemList.get(i).updatePlay();
 
         stage.act();
         stage.draw();

@@ -36,6 +36,18 @@ public class ItemTool extends Tool {
                 Wall wall = new Wall();
                 wall.setSprite(new Sprite(new Texture("unitTexture/Wall.png")));
                 return wall;
+            case CAMERA:
+                Camera camera = new Camera();
+                camera.setSprite(new Sprite(new Texture("unitTexture/Camera.png")));
+                return camera;
+            case GUARD:
+                Guard guard = new Guard();
+                guard.setSprite(new Sprite(new Texture("unitTexture/GuardEditor1.png")), new Sprite(new Texture("unitTexture/GuardEditor2.png")));
+                return guard;
+            case LASER:
+                Laser laser = new Laser();
+                laser.setSprite(new Sprite(new Texture("unitTexture/Laser.png")));
+                return laser;
 
         }
         return null;

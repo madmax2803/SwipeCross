@@ -29,7 +29,8 @@ public class CommonMenu {
         menu = new Table();
 
         List<String> list = new List<>(skin);
-        list.setItems("X", "Y", "Angle");
+        list.setItems(" X", " Y", " Angle");
+
         list.setSelectedIndex(0);
 
         char[] accepted = new char[]{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.', '-'};
@@ -98,7 +99,6 @@ public class CommonMenu {
         textFieldTable.add(xField).row();
         textFieldTable.add(yField).row();
         textFieldTable.add(angleField).row();
-
 
         menu.add(list);
         menu.add(textFieldTable);
