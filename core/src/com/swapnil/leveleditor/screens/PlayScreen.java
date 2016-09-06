@@ -5,11 +5,15 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -33,10 +37,17 @@ public class PlayScreen implements Screen, InputProcessor {
     private SwipeCross game;
     private Player player;
 
+    private Vector2 p1 = new Vector2(), p2 = new Vector2(), collision = new Vector2(), normal = new Vector2(), temp = new Vector2();
+    private ShapeRenderer trajectoryRay = new ShapeRenderer();
+    private boolean showTrajectoryRay = false;
     private final float PIXELS_TO_METRES = 100f;
+
+    RayCastCallback callback;
 
     private Matrix4 matrix4;
     private Box2DDebugRenderer debugRenderer;
+    private Vector2 temp1 = new Vector2();
+    private Vector2 temp2 = new Vector2();
 
     public PlayScreen(String levelFile, SwipeCross game) {
 
@@ -97,6 +108,13 @@ public class PlayScreen implements Screen, InputProcessor {
 
         new Boundary(PIXELS_TO_METRES,world);
 
+        callback = (fixture, point, normal1, fraction) -> {
+            collision.set(point.x*PIXELS_TO_METRES, point.y*PIXELS_TO_METRES);
+            PlayScreen.this.normal.set(normal1.x*PIXELS_TO_METRES, normal1.y*PIXELS_TO_METRES).
+                    add(point.x*PIXELS_TO_METRES, point.y*PIXELS_TO_METRES);
+            return fraction;
+        };
+
         TextButton editor = new TextButton("Editor", skin);
         editor.setPosition(0, Gdx.graphics.getHeight() - editor.getHeight());
         editor.addListener(new ChangeListener() {
@@ -122,6 +140,8 @@ public class PlayScreen implements Screen, InputProcessor {
         Gdx.gl.glClearColor(1, 1, 1, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+        p1.set(player.getX(), player.getY());
+
         world.step(1f/60f, 6, 2);
 
         for(int i= 0;i<itemList.size;i++)
@@ -130,6 +150,16 @@ public class PlayScreen implements Screen, InputProcessor {
         stage.act();
         stage.draw();
 
+        if(showTrajectoryRay) {
+            trajectoryRay.begin(ShapeRenderer.ShapeType.Line);
+            trajectoryRay.setColor(Color.BLACK);
+            trajectoryRay.line(p1, p2);
+            temp1.set(p1.x/PIXELS_TO_METRES, p1.y/PIXELS_TO_METRES);
+            temp2.set(p2.x/PIXELS_TO_METRES, p2.y/PIXELS_TO_METRES);
+            world.rayCast(callback, temp1, temp2);
+            trajectoryRay.line(collision, normal);
+            trajectoryRay.end();
+        }
         debugRenderer.render(world, matrix4);
     }
 
@@ -181,21 +211,30 @@ public class PlayScreen implements Screen, InputProcessor {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         player.setOldPoint(screenX, screenY);
-        return false;
+        temp.set(screenX, screenY);
+        return true;
     }
 
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
         player.setNewPoint(screenX, screenY);
 
-        player.getBody().applyForceToCenter(-player.getNewPoint().distanceX(player.getOldPoint().getX()),
-                player.getNewPoint().distanceY(player.getOldPoint().getY()), true);
-        return false;
+        showTrajectoryRay = false;
+
+        player.getBody().setAngularVelocity(0f);
+        player.getBody().setLinearVelocity(0f, 0f);
+
+        player.getBody().applyForceToCenter(player.getNewPoint().distanceX(player.getOldPoint().getX())/PIXELS_TO_METRES,
+                -player.getNewPoint().distanceY(player.getOldPoint().getY())/PIXELS_TO_METRES, true);
+        return true;
     }
 
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
+        p2.set(p1.x + (screenX - temp.x),p1.y - (screenY - temp.y));
+
+        showTrajectoryRay = true;
+        return true;
     }
 
     @Override

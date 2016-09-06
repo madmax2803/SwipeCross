@@ -1,0 +1,40 @@
+<Root>
+	<Player>
+		<Position X="136.0" Y="528.0"/>
+		<Angle Value="0.0"/>
+	</Player>
+	<Wall>
+		<Position X="300.0" Y="396.0"/>
+		<Angle Value="0.0"/>
+		<Size Width="25.0" Height="450.0"/>
+	</Wall>
+	<Wall>
+		<Position X="300.0" Y="37.0"/>
+		<Angle Value="0.0"/>
+		<Size Width="25.0" Height="75.0"/>
+	</Wall>
+	<Wall>
+		<Position X="533.0" Y="187.0"/>
+		<Angle Value="90.0"/>
+		<Size Width="25.0" Height="500.0"/>
+	</Wall>
+	<Wall>
+		<Position X="964.0" Y="187.0"/>
+		<Angle Value="90.0"/>
+		<Size Width="25.0" Height="75.0"/>
+	</Wall>
+	<Wall>
+		<Position X="762.0" Y="377.0"/>
+		<Angle Value="90.0"/>
+		<Size Width="25.0" Height="500.0"/>
+	</Wall>
+	<Wall>
+		<Position X="340.0" Y="377.0"/>
+		<Angle Value="90.0"/>
+		<Size Width="25.0" Height="100.0"/>
+	</Wall>
+	<Destination>
+		<Position X="989.0" Y="514.0"/>
+		<Angle Value="0.0"/>
+	</Destination>
+</Root>

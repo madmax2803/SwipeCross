@@ -95,23 +95,14 @@ public class Destination extends Item {
 
     @Override
     public void updateEditor() {
-
-        if (body!=null) {
-            sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
-                    Gdx.graphics.getHeight() - body.getPosition().y * PIXELS_TO_METRES - height/2);
-        }else{
-            sprite.setPosition(x - width/2,
-                    Gdx.graphics.getHeight() -  y - height/2);
-
-        }
+        sprite.setPosition(x - width/2, Gdx.graphics.getHeight() -  y - height/2);
         sprite.setRotation(getAngle());
-
 
         sprite.setBounds(x - width/2,Gdx.graphics.getHeight() -  y - height/2,
                 width, height);
         sprite.setOriginCenter();
-        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
 
+        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
         actor.setWidth(width);
         actor.setHeight(height);
         actor.setX(getX() - width/2);
@@ -122,6 +113,21 @@ public class Destination extends Item {
 
     @Override
     public void updatePlay() {
+        sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
+                body.getPosition().y * PIXELS_TO_METRES - height/2);
+        sprite.setPosition(x - width/2, Gdx.graphics.getHeight() -  y - height/2);
+        sprite.setRotation(getAngle());
+
+        sprite.setBounds(x - width/2,Gdx.graphics.getHeight() -  y - height/2,
+                width, height);
+        sprite.setOriginCenter();
+
+        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
+        actor.setWidth(width);
+        actor.setHeight(height);
+        actor.setX(getX() - width/2);
+        actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
+        actor.setRotation(getAngle());
 
     }
 

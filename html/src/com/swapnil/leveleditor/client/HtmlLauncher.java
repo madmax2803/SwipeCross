@@ -3,7 +3,7 @@ package com.swapnil.leveleditor.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.swapnil.leveleditor.screens.LevelEditor;
+import com.swapnil.leveleditor.SwipeCross;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -13,7 +13,7 @@ public class HtmlLauncher extends GwtApplication {
         }
 
         @Override
-        public ApplicationListener getApplicationListener () {
-                return new LevelEditor(this);
+        public ApplicationListener createApplicationListener () {
+                return new SwipeCross();
         }
 }

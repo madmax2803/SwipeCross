@@ -130,22 +130,15 @@ public class Wall extends Item{
     @Override
     public void updateEditor() {
 
-        if (body!=null) {
-            sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - getWidth()/2,
-                    Gdx.graphics.getHeight() -  body.getPosition().y * PIXELS_TO_METRES - getHeight()/2);
-        }else{
-            sprite.setPosition(x - getWidth()/2,
-                    Gdx.graphics.getHeight() -  y - getHeight()/2);
-        }
+
+        sprite.setPosition(x - getWidth()/2, Gdx.graphics.getHeight() -  y - getHeight()/2);
         sprite.setRotation(getAngle());
         sprite.setSize(getWidth(), getHeight());
-
-
         sprite.setBounds(x - getWidth()/2,Gdx.graphics.getHeight() - y - getHeight()/2,
                 getWidth(), getHeight());
         sprite.setOriginCenter();
-        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
 
+        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
         actor.setWidth(this.getWidth());
         actor.setHeight(this.getHeight());
         actor.setX(getX() - this.getWidth()/2);
@@ -156,6 +149,20 @@ public class Wall extends Item{
 
     @Override
     public void updatePlay() {
+        sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
+                body.getPosition().y * PIXELS_TO_METRES - height/2);
+        sprite.setOriginCenter();
+        sprite.setRotation(getAngle());
+        sprite.setSize(getWidth(), getHeight());
+        sprite.setBounds(x - getWidth()/2,Gdx.graphics.getHeight() - y - getHeight()/2,
+                getWidth(), getHeight());
+        sprite.setOriginCenter();
 
+        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
+        actor.setWidth(width);
+        actor.setHeight(height);
+        actor.setX(getX() - width/2);
+        actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
+        actor.setRotation(getAngle());
     }
 }
