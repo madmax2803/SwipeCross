@@ -348,8 +348,12 @@ public class LevelEditor implements InputProcessor, Screen {
 					break;
 			}
 		}
-		else if(keycode == Input.Keys.SPACE)
+		else if(keycode == Input.Keys.SPACE || keycode == Input.Keys.MENU)
 			itemMenu.setVisible(!itemMenu.isVisible());
+		else if(keycode == Input.Keys.VOLUME_UP)
+			scrolled(1);
+		else if(keycode == Input.Keys.VOLUME_DOWN)
+			scrolled(-1);
 		return false;
 	}
 

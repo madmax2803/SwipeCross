@@ -12,7 +12,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.RayCastCallback;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -37,12 +36,13 @@ public class PlayScreen implements Screen, InputProcessor {
     private SwipeCross game;
     private Player player;
 
-    private Vector2 p1 = new Vector2(), p2 = new Vector2(), collision = new Vector2(), normal = new Vector2(), temp = new Vector2();
+    private Vector2 p1 = new Vector2(), p2 = new Vector2(), collision = new Vector2(), normal = new Vector2(), temp = new Vector2(), deflection = new Vector2();
     private ShapeRenderer trajectoryRay = new ShapeRenderer();
     private boolean showTrajectoryRay = false;
+
     private final float PIXELS_TO_METRES = 100f;
 
-    RayCastCallback callback;
+    private RayCastCallback callback;
 
     private Matrix4 matrix4;
     private Box2DDebugRenderer debugRenderer;
@@ -112,6 +112,9 @@ public class PlayScreen implements Screen, InputProcessor {
             collision.set(point.x*PIXELS_TO_METRES, point.y*PIXELS_TO_METRES);
             PlayScreen.this.normal.set(normal1.x*PIXELS_TO_METRES, normal1.y*PIXELS_TO_METRES).
                     add(point.x*PIXELS_TO_METRES, point.y*PIXELS_TO_METRES);
+            float angle = normal.angle(p1);
+            deflection.setLength(p2.len());
+            deflection.rotate(angle);
             return fraction;
         };
 
@@ -141,6 +144,7 @@ public class PlayScreen implements Screen, InputProcessor {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         p1.set(player.getX(), player.getY());
+        deflection.set(collision).add(100,100);
 
         world.step(1f/60f, 6, 2);
 
@@ -158,8 +162,10 @@ public class PlayScreen implements Screen, InputProcessor {
             temp2.set(p2.x/PIXELS_TO_METRES, p2.y/PIXELS_TO_METRES);
             world.rayCast(callback, temp1, temp2);
             trajectoryRay.line(collision, normal);
+            trajectoryRay.line(collision, deflection);
             trajectoryRay.end();
         }
+
         debugRenderer.render(world, matrix4);
     }
 
@@ -220,6 +226,8 @@ public class PlayScreen implements Screen, InputProcessor {
         player.setNewPoint(screenX, screenY);
 
         showTrajectoryRay = false;
+        collision.set(0f,0f);
+        normal.set(0f, 0f);
 
         player.getBody().setAngularVelocity(0f);
         player.getBody().setLinearVelocity(0f, 0f);

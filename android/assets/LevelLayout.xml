@@ -14,7 +14,7 @@
 		<Size Width="25.0" Height="75.0"/>
 	</Wall>
 	<Wall>
-		<Position X="533.0" Y="187.0"/>
+		<Position X="546.0" Y="188.0"/>
 		<Angle Value="90.0"/>
 		<Size Width="25.0" Height="500.0"/>
 	</Wall>
