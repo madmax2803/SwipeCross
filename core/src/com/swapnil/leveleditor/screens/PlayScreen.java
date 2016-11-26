@@ -18,9 +18,11 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
+import com.sun.org.apache.bcel.internal.generic.FLOAD;
 import com.swapnil.leveleditor.SwipeCross;
 import com.swapnil.leveleditor.item.*;
 import com.swapnil.leveleditor.util.Boundary;
@@ -35,6 +37,8 @@ public class PlayScreen implements Screen, InputProcessor {
     private String levelFile;
     private SwipeCross game;
     private Player player;
+    private TextField textField;
+    private float angle;
 
     private Vector2 p1 = new Vector2(), p2 = new Vector2(), collision = new Vector2(), normal = new Vector2(), temp = new Vector2(), deflection = new Vector2();
     private ShapeRenderer trajectoryRay = new ShapeRenderer();
@@ -54,6 +58,11 @@ public class PlayScreen implements Screen, InputProcessor {
         this.levelFile = levelFile;
         this.game = game;
 
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("UI/atlas.pack"));
+        Skin skin = new Skin(Gdx.files.internal("Skins/MenuSkin.json"), atlas);
+
+        textField = new TextField("", skin);
+        textField.setPosition(0, 0);
         stage = new Stage();
 
         try {
@@ -112,14 +121,15 @@ public class PlayScreen implements Screen, InputProcessor {
             collision.set(point.x*PIXELS_TO_METRES, point.y*PIXELS_TO_METRES);
             PlayScreen.this.normal.set(normal1.x*PIXELS_TO_METRES, normal1.y*PIXELS_TO_METRES).
                     add(point.x*PIXELS_TO_METRES, point.y*PIXELS_TO_METRES);
-            float angle = normal.angle(p1);
-            deflection.setLength(p2.len());
-            deflection.rotate(angle);
+            angle = collision.angle(normal);
+            deflection.setLength(p1.len());
+            deflection.rotate(60);
             return fraction;
         };
 
         TextButton editor = new TextButton("Editor", skin);
         editor.setPosition(0, Gdx.graphics.getHeight() - editor.getHeight());
+        textField.setPosition(editor.getX() + editor.getWidth(), editor.getY());
         editor.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -135,6 +145,7 @@ public class PlayScreen implements Screen, InputProcessor {
         debugRenderer = new Box2DDebugRenderer();
 
         stage.addActor(editor);
+        stage.addActor(textField);
 
     }
 
@@ -148,6 +159,8 @@ public class PlayScreen implements Screen, InputProcessor {
 
         world.step(1f/60f, 6, 2);
 
+        textField.setText(Double.toString(Math.toDegrees(angle)));
+
         for(int i= 0;i<itemList.size;i++)
             itemList.get(i).updatePlay();
 
@@ -155,13 +168,16 @@ public class PlayScreen implements Screen, InputProcessor {
         stage.draw();
 
         if(showTrajectoryRay) {
+
             trajectoryRay.begin(ShapeRenderer.ShapeType.Line);
-            trajectoryRay.setColor(Color.BLACK);
+            trajectoryRay.setColor(Color.RED);
             trajectoryRay.line(p1, p2);
             temp1.set(p1.x/PIXELS_TO_METRES, p1.y/PIXELS_TO_METRES);
             temp2.set(p2.x/PIXELS_TO_METRES, p2.y/PIXELS_TO_METRES);
             world.rayCast(callback, temp1, temp2);
+            trajectoryRay.setColor(Color.BLACK);
             trajectoryRay.line(collision, normal);
+            trajectoryRay.setColor(Color.BLUE);
             trajectoryRay.line(collision, deflection);
             trajectoryRay.end();
         }
@@ -218,6 +234,10 @@ public class PlayScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         player.setOldPoint(screenX, screenY);
         temp.set(screenX, screenY);
+
+        player.getBody().setAngularVelocity(0f);
+        player.getBody().setLinearVelocity(0f, 0f);
+
         return true;
     }
 
