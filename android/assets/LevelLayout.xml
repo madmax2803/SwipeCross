@@ -37,4 +37,10 @@
 		<Position X="989.0" Y="514.0"/>
 		<Angle Value="0.0"/>
 	</Destination>
+	<Camera>
+		<Position X="300.0" Y="16.0"/>
+		<Angle Value="180.0"/>
+		<Size Width="102.0" Height="102.0"/>
+		<DeviationAngle Value="135.0"/>
+	</Camera>
 </Root>
