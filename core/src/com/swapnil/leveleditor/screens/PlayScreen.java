@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.sun.org.apache.bcel.internal.generic.FLOAD;
+import com.swapnil.leveleditor.GameData;
 import com.swapnil.leveleditor.SwipeCross;
 import com.swapnil.leveleditor.item.*;
 import com.swapnil.leveleditor.util.Boundary;
@@ -31,11 +32,11 @@ import java.io.IOException;
 
 public class PlayScreen implements Screen, InputProcessor {
 
+    private GameData gameData;
+
     private Array<Item> itemList = new Array<>();
     private Stage stage;
     private World world;
-    private String levelFile;
-    private SwipeCross game;
     private Player player;
     private TextField textField;
     private float angle;
@@ -53,11 +54,9 @@ public class PlayScreen implements Screen, InputProcessor {
     private Vector2 temp1 = new Vector2();
     private Vector2 temp2 = new Vector2();
 
-    public PlayScreen(String levelFile, SwipeCross game) {
+    public PlayScreen(GameData gameData) {
 
-        this.levelFile = levelFile;
-        this.game = game;
-
+        this.gameData = gameData;
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("UI/atlas.pack"));
         Skin skin = new Skin(Gdx.files.internal("Skins/MenuSkin.json"), atlas);
 
@@ -66,7 +65,7 @@ public class PlayScreen implements Screen, InputProcessor {
         stage = new Stage();
 
         try {
-            XmlReader.Element element = new XmlReader().parse(new FileHandle(levelFile));
+            XmlReader.Element element = new XmlReader().parse(new FileHandle(gameData.getLevelFile()));
             String itemName;
             for(int i=0;i<element.getChildCount();i++) {
                 itemName = element.getChild(i).getName();
@@ -133,7 +132,7 @@ public class PlayScreen implements Screen, InputProcessor {
         editor.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                game.setScreen(new LevelEditor(levelFile, game));
+                gameData.getGame().setScreen(new LevelEditor(gameData));
             }
         });
 

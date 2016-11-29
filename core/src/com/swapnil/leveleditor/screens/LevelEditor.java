@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
+import com.swapnil.leveleditor.GameData;
 import com.swapnil.leveleditor.SwipeCross;
 import com.swapnil.leveleditor.item.*;
 import com.swapnil.leveleditor.listener.SaveListener;
@@ -30,8 +31,7 @@ public class LevelEditor implements InputProcessor, Screen {
 
 	private Stage stage;
 
-	private String levelFile;
-	private SwipeCross game;
+	private GameData gameData;
 	private boolean drawSelectionRectangle = false;
 
 	private Array<Item> itemList = new Array<>();
@@ -75,11 +75,11 @@ public class LevelEditor implements InputProcessor, Screen {
 		return handle;
 	}
 
-	public LevelEditor(String levelFile,SwipeCross game) {
-		this.levelFile = levelFile;
-		this.game = game;
+	public LevelEditor(GameData gameData) {
 
-		handle = new FileHandle(levelFile);
+		this.gameData = gameData;
+
+		handle = new FileHandle(gameData.getLevelFile());
 		selectTool = new SelectTool(this);
 		deleteTool = new DeleteTool(this);
 		wallTool = new ItemTool(this, ItemType.WALL);
@@ -287,7 +287,7 @@ public class LevelEditor implements InputProcessor, Screen {
 		play.addListener(new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
-				game.setScreen(new PlayScreen(levelFile,game));
+				gameData.getGame().setScreen(new PlayScreen(gameData));
 			}
 		});
 
@@ -435,7 +435,6 @@ public class LevelEditor implements InputProcessor, Screen {
 	@Override
 	public void dispose() {
 		stage.dispose();
-		game.dispose();
 	}
 
 	@Override

@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.swapnil.leveleditor.GameData;
 import com.swapnil.leveleditor.util.Point;
 
 public class Laser extends Item {
@@ -26,7 +27,6 @@ public class Laser extends Item {
 
     private final float width = new Texture(Gdx.files.internal("unitTexture/Laser.png")).getWidth();
     private final float height = new Texture(Gdx.files.internal("unitTexture/Laser.png")).getHeight();
-
 
     public void setSprite(Sprite sprite) {
         this.sprite = sprite;

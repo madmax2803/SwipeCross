@@ -1,12 +1,12 @@
 package com.swapnil.leveleditor;
 
 import com.badlogic.gdx.Game;
-import com.swapnil.leveleditor.screens.LevelEditor;
-import com.swapnil.leveleditor.screens.PlayScreen;
+import com.swapnil.leveleditor.screens.GameOverScreen;
 
 public class SwipeCross extends Game {
 	@Override
 	public void create() {
-		setScreen(new PlayScreen("LevelLayout.xml",this));
+		GameData gameData = new GameData("LevelLayout.xml", this);
+		setScreen(new GameOverScreen(gameData, true));
 	}
 }

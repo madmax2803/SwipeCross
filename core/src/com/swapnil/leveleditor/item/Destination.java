@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
 
-public class Destination extends Item {
+public class Destination extends Item implements ContactListener{
 
     private Sprite sprite;
     private Body body;
@@ -88,6 +88,8 @@ public class Destination extends Item {
         fixtureDef.shape = shape;
         fixtureDef.restitution = 0.5f;
         fixtureDef.density = 0.1f;
+        fixtureDef.isSensor = true;
+
         body.createFixture(fixtureDef);
 
         shape.dispose();
@@ -131,4 +133,24 @@ public class Destination extends Item {
 
     }
 
+    @Override
+    public void beginContact(Contact contact) {
+//        body.getWorld().get
+//        game.setScreen(new GameOverScreen(levelFile,game, true));
+    }
+
+    @Override
+    public void endContact(Contact contact) {
+
+    }
+
+    @Override
+    public void preSolve(Contact contact, Manifold oldManifold) {
+
+    }
+
+    @Override
+    public void postSolve(Contact contact, ContactImpulse impulse) {
+
+    }
 }

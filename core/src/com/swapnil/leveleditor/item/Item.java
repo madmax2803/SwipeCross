@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.swapnil.leveleditor.GameData;
 
 public abstract class Item {
 
@@ -14,7 +15,7 @@ public abstract class Item {
     protected Actor actor=new Actor();
     protected final float PIXELS_TO_METRES = 100f;
 
-    public Item() {
+    public Item(){
 
     }
 

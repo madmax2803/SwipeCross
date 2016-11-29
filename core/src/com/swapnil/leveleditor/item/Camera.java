@@ -5,19 +5,24 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.swapnil.leveleditor.GameData;
+import com.swapnil.leveleditor.screens.GameOverScreen;
 import com.swapnil.leveleditor.util.forms.CameraForm;
 
-public class Camera extends Item{
+public class Camera extends Item implements ContactListener{
 
     private Sprite sprite;
     private float deviationAngle;
     private float width, height;
     private CameraForm cameraForm;
+
+    private Body body;
 
     private boolean deviateUp;
 
@@ -47,6 +52,7 @@ public class Camera extends Item{
     }
 
     public Camera() {
+
         this.actor = new Actor() {
             @Override
             public void draw(Batch batch, float parentAlpha) {
@@ -135,6 +141,26 @@ public class Camera extends Item{
     @Override
     public void createBody(World world) {
 
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.StaticBody;
+        bodyDef.position.set(getX()/PIXELS_TO_METRES,Gdx.graphics.getHeight()/PIXELS_TO_METRES - getY()/PIXELS_TO_METRES);
+        bodyDef.angle = getAngle() * MathUtils.degRad;
+
+        body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox( getWidth()/2/PIXELS_TO_METRES, getHeight()/2/PIXELS_TO_METRES);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.restitution = 0f;
+        fixtureDef.density = 0;
+        fixtureDef.isSensor = true;
+
+        body.createFixture(fixtureDef);
+
+        shape.dispose();
+
     }
 
     @Override
@@ -166,6 +192,21 @@ public class Camera extends Item{
 
     @Override
     public void updatePlay() {
+        sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
+                body.getPosition().y * PIXELS_TO_METRES - height/2);
+        sprite.setPosition(x - width/2, Gdx.graphics.getHeight() -  y - height/2);
+        sprite.setRotation(getAngle());
+
+        sprite.setBounds(x - width/2,Gdx.graphics.getHeight() -  y - height/2,
+                width, height);
+        sprite.setOriginCenter();
+
+        actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
+        actor.setWidth(width);
+        actor.setHeight(height);
+        actor.setX(getX() - width/2);
+        actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
+        actor.setRotation(getAngle());
 
     }
 
@@ -184,4 +225,23 @@ public class Camera extends Item{
         }
     }
 
+    @Override
+    public void beginContact(Contact contact) {
+//        gameData.getGame().setScreen(new GameOverScreen(gameData, true));
+    }
+
+    @Override
+    public void endContact(Contact contact) {
+
+    }
+
+    @Override
+    public void preSolve(Contact contact, Manifold oldManifold) {
+
+    }
+
+    @Override
+    public void postSolve(Contact contact, ContactImpulse impulse) {
+
+    }
 }
