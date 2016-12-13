@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.swapnil.leveleditor.GameData;
+import com.swapnil.leveleditor.screens.GameOverScreen;
 import com.swapnil.leveleditor.util.Point;
 
 public class Player extends Item {
@@ -19,6 +21,12 @@ public class Player extends Item {
 
     private Point oldPoint;
     private Point newPoint;
+
+    public void setGameData(GameData gameData) {
+        this.gameData = gameData;
+    }
+
+    private GameData gameData;
 
     public Point getNewPoint() {
         return newPoint;
@@ -111,6 +119,7 @@ public class Player extends Item {
         bodyDef.angle = getAngle() * MathUtils.degRad;
 
         body = world.createBody(bodyDef);
+        body.setUserData(this);
 
         CircleShape circle = new CircleShape();
         circle.setRadius(width/2/PIXELS_TO_METRES);
@@ -155,6 +164,20 @@ public class Player extends Item {
         actor.setX(getX() - width/2);
         actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
         actor.setRotation(getAngle());
+    }
+
+    @Override
+    public void beginContactWith(Item itemB) {
+        if(itemB.getClass()==Camera.class) {
+            gameData.getGame().setScreen(new GameOverScreen(gameData, false));
+        }
+        else if(itemB.getClass() == Destination.class) {
+            gameData.getGame().setScreen(new GameOverScreen(gameData, true));
+        }
+        else if(itemB.getClass() == Wall.class) {
+            //DO NOTHING
+        }
+
     }
 
 }

@@ -179,4 +179,9 @@ public class Guard extends Item {
 
     }
 
+    @Override
+    public void beginContactWith(Item itemB) {
+
+    }
+
 }

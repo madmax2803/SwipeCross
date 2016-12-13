@@ -26,6 +26,7 @@ import com.sun.org.apache.bcel.internal.generic.FLOAD;
 import com.swapnil.leveleditor.GameData;
 import com.swapnil.leveleditor.SwipeCross;
 import com.swapnil.leveleditor.item.*;
+import com.swapnil.leveleditor.listener.CollisionListener;
 import com.swapnil.leveleditor.util.Boundary;
 
 import java.io.IOException;
@@ -64,6 +65,7 @@ public class PlayScreen implements Screen, InputProcessor {
         textField.setPosition(0, 0);
         stage = new Stage();
 
+
         try {
             XmlReader.Element element = new XmlReader().parse(new FileHandle(gameData.getLevelFile()));
             String itemName;
@@ -72,6 +74,7 @@ public class PlayScreen implements Screen, InputProcessor {
                 switch (itemName) {
                     case "Player":
                         player = new Player().loadFromXml(element.getChild(i));
+                        player.setGameData(gameData);
                         addToStage(player);
                         break;
                     case "Destination":
@@ -95,8 +98,23 @@ public class PlayScreen implements Screen, InputProcessor {
             e.printStackTrace();
         }
 
+    }
 
+    private void addBoundaryWalls() {
+        Wall lower, left, right, upper;
 
+        lower = new Wall(0, 0, Gdx.graphics.getWidth(), 1, 0f);
+
+        left = new Wall(0, 0, Gdx.graphics.getHeight(), 1, 90f);
+
+        upper = new Wall(Gdx.graphics.getHeight(), 0, Gdx.graphics.getWidth(), 1, 0f);
+
+        right = new Wall(0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 1, 90f);
+
+        lower.createBody(world);
+        left.createBody(world);
+        upper.createBody(world);
+        right.createBody(world);
     }
 
     @Override
@@ -106,6 +124,8 @@ public class PlayScreen implements Screen, InputProcessor {
         inputMultiplexer.addProcessor(stage);
         inputMultiplexer.addProcessor(this);
         Gdx.input.setInputProcessor(inputMultiplexer);
+
+        world.setContactListener(new CollisionListener());
     }
 
     private void init() {
@@ -114,7 +134,8 @@ public class PlayScreen implements Screen, InputProcessor {
 
         world = new World(new Vector2(0f, 0f), true);
 
-        new Boundary(PIXELS_TO_METRES,world);
+        //new Boundary(PIXELS_TO_METRES,world);
+        addBoundaryWalls();
 
         callback = (fixture, point, normal1, fraction) -> {
             collision.set(point.x*PIXELS_TO_METRES, point.y*PIXELS_TO_METRES);

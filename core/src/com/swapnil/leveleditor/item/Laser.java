@@ -137,5 +137,10 @@ public class Laser extends Item {
         actor.setRotation(getAngle());
     }
 
+    @Override
+    public void beginContactWith(Item itemB) {
+
+    }
+
 
 }

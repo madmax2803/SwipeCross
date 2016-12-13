@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
 
-public class Destination extends Item implements ContactListener{
+public class Destination extends Item{
 
     private Sprite sprite;
     private Body body;
@@ -80,6 +80,7 @@ public class Destination extends Item implements ContactListener{
         bodyDef.angle = getAngle() * MathUtils.degRad;
 
         body = world.createBody(bodyDef);
+        body.setUserData(this);
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width/2/PIXELS_TO_METRES, height/2/PIXELS_TO_METRES);
@@ -134,23 +135,7 @@ public class Destination extends Item implements ContactListener{
     }
 
     @Override
-    public void beginContact(Contact contact) {
-//        body.getWorld().get
-//        game.setScreen(new GameOverScreen(levelFile,game, true));
-    }
-
-    @Override
-    public void endContact(Contact contact) {
-
-    }
-
-    @Override
-    public void preSolve(Contact contact, Manifold oldManifold) {
-
-    }
-
-    @Override
-    public void postSolve(Contact contact, ContactImpulse impulse) {
+    public void beginContactWith(Item itemB) {
 
     }
 }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.XmlReader;
 import com.badlogic.gdx.utils.XmlWriter;
+import com.swapnil.leveleditor.screens.PlayScreen;
 import com.swapnil.leveleditor.util.forms.WallForm;
 
 public class Wall extends Item{
@@ -20,6 +21,14 @@ public class Wall extends Item{
     private Body body;
 
     private WallForm wallForm;
+
+    public Wall(float x, float y, float width, float height, float angle) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.setAngle(angle);
+    }
 
     public float getWidth() {
         return width;
@@ -114,6 +123,7 @@ public class Wall extends Item{
         bodyDef.angle = getAngle() * MathUtils.degRad;
 
         body = world.createBody(bodyDef);
+        body.setUserData(this);
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox( getWidth()/2/PIXELS_TO_METRES, getHeight()/2/PIXELS_TO_METRES);
@@ -164,5 +174,13 @@ public class Wall extends Item{
         actor.setX(getX() - width/2);
         actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
         actor.setRotation(getAngle());
+    }
+
+    @Override
+    public void beginContactWith(Item itemB) {
+        if(itemB.getClass() == Player.class) {
+            //DO NOTHING
+        }
+
     }
 }

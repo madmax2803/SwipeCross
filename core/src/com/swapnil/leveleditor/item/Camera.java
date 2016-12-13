@@ -15,7 +15,7 @@ import com.swapnil.leveleditor.GameData;
 import com.swapnil.leveleditor.screens.GameOverScreen;
 import com.swapnil.leveleditor.util.forms.CameraForm;
 
-public class Camera extends Item implements ContactListener{
+public class Camera extends Item {
 
     private Sprite sprite;
     private float deviationAngle;
@@ -41,12 +41,15 @@ public class Camera extends Item implements ContactListener{
     public float getWidth() {
         return width;
     }
+
     public void setWidth(float width) {
         this.width = width;
     }
+
     public float getHeight() {
         return height;
     }
+
     public void setHeight(float height) {
         this.height = height;
     }
@@ -91,7 +94,7 @@ public class Camera extends Item implements ContactListener{
 
     @Override
     public boolean contains(int screenX, int screenY) {
-        sprite.setBounds(x - getWidth()/2,Gdx.graphics.getHeight() - y - getHeight()/2,
+        sprite.setBounds(x - getWidth() / 2, Gdx.graphics.getHeight() - y - getHeight() / 2,
                 getWidth(), getHeight());
 
         return sprite.getBoundingRectangle().contains(screenX, screenY);
@@ -102,23 +105,22 @@ public class Camera extends Item implements ContactListener{
 
         try {
             xmlWriter.element("Camera")
-                        .element("Position")
-                            .attribute("X", getX())
-                            .attribute("Y", getY())
-                        .pop()
-                        .element("Angle")
-                            .attribute("Value", getAngle())
-                        .pop()
-                        .element("Size")
-                            .attribute("Width", getWidth())
-                            .attribute("Height", getHeight())
-                        .pop()
-                        .element("DeviationAngle")
-                            .attribute("Value", getDeviationAngle())
-                        .pop()
+                    .element("Position")
+                    .attribute("X", getX())
+                    .attribute("Y", getY())
+                    .pop()
+                    .element("Angle")
+                    .attribute("Value", getAngle())
+                    .pop()
+                    .element("Size")
+                    .attribute("Width", getWidth())
+                    .attribute("Height", getHeight())
+                    .pop()
+                    .element("DeviationAngle")
+                    .attribute("Value", getDeviationAngle())
+                    .pop()
                     .pop();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("XML WRITE FAILED");
         }
     }
@@ -143,19 +145,22 @@ public class Camera extends Item implements ContactListener{
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(getX()/PIXELS_TO_METRES,Gdx.graphics.getHeight()/PIXELS_TO_METRES - getY()/PIXELS_TO_METRES);
+        bodyDef.position.set(getX() / PIXELS_TO_METRES, Gdx.graphics.getHeight() / PIXELS_TO_METRES - getY() / PIXELS_TO_METRES);
         bodyDef.angle = getAngle() * MathUtils.degRad;
 
         body = world.createBody(bodyDef);
+        body.setUserData(this);
 
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox( getWidth()/2/PIXELS_TO_METRES, getHeight()/2/PIXELS_TO_METRES);
+        shape.setAsBox(getWidth() / 2 / PIXELS_TO_METRES, getHeight() / 2 / PIXELS_TO_METRES);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.restitution = 0f;
         fixtureDef.density = 0;
         fixtureDef.isSensor = true;
+
+
 
         body.createFixture(fixtureDef);
 
@@ -166,20 +171,20 @@ public class Camera extends Item implements ContactListener{
     @Override
     public void updateEditor() {
 
-        sprite.setX(getX() - getWidth()/2);
-        sprite.setY(Gdx.graphics.getHeight() - getY() - getHeight()/2);
+        sprite.setX(getX() - getWidth() / 2);
+        sprite.setY(Gdx.graphics.getHeight() - getY() - getHeight() / 2);
 
         sprite.setRotation(getAngle());
         setAngle(sprite.getRotation());
         sprite.setSize(getWidth(), getHeight());
 
         sprite.setOriginCenter();
-        sprite.setOrigin(sprite.getOriginX(), sprite.getOriginY() - getHeight()/2);
+        sprite.setOrigin(sprite.getOriginX(), sprite.getOriginY() - getHeight() / 2);
         actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
 
 
-        actor.setX(getX() - getWidth()/2);
-        actor.setY(Gdx.graphics.getHeight() - getY() - getHeight()/2);
+        actor.setX(getX() - getWidth() / 2);
+        actor.setY(Gdx.graphics.getHeight() - getY() - getHeight() / 2);
         actor.setWidth(getWidth());
         actor.setHeight(getHeight());
         actor.setRotation(getAngle());
@@ -192,21 +197,32 @@ public class Camera extends Item implements ContactListener{
 
     @Override
     public void updatePlay() {
-        sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width/2,
-                body.getPosition().y * PIXELS_TO_METRES - height/2);
-        sprite.setPosition(x - width/2, Gdx.graphics.getHeight() -  y - height/2);
+        sprite.setPosition(body.getPosition().x * PIXELS_TO_METRES - width / 2,
+                body.getPosition().y * PIXELS_TO_METRES - height / 2);
+        sprite.setPosition(x - width / 2, Gdx.graphics.getHeight() - y - height / 2);
         sprite.setRotation(getAngle());
 
-        sprite.setBounds(x - width/2,Gdx.graphics.getHeight() -  y - height/2,
+        sprite.setBounds(x - width / 2, Gdx.graphics.getHeight() - y - height / 2,
                 width, height);
         sprite.setOriginCenter();
 
         actor.setOrigin(sprite.getOriginX(), sprite.getOriginY());
         actor.setWidth(width);
         actor.setHeight(height);
-        actor.setX(getX() - width/2);
-        actor.setY(Gdx.graphics.getHeight() - getY() - height/2);
+        actor.setX(getX() - width / 2);
+        actor.setY(Gdx.graphics.getHeight() - getY() - height / 2);
         actor.setRotation(getAngle());
+
+    }
+
+    @Override
+    public void beginContactWith(Item itemB) {
+        if (itemB.getClass() == Player.class) {
+            //TODO Colour change code
+        }
+        else {
+            //TODO other fixture combinations
+        }
 
     }
 
@@ -214,34 +230,15 @@ public class Camera extends Item implements ContactListener{
         if (deviateUp) {
             cameraRotationAngle += 0.5f;
             sprite.setRotation(getAngle() + cameraRotationAngle);
-            if(Math.abs(cameraRotationAngle) == Math.abs(getDeviationAngle()))
+            if (Math.abs(cameraRotationAngle) == Math.abs(getDeviationAngle()))
                 deviateUp = false;
-        }else {
+        } else {
             cameraRotationAngle -= 0.5f;
             sprite.setRotation(getAngle() + cameraRotationAngle);
-            if(Math.abs(cameraRotationAngle) == Math.abs(getDeviationAngle()))
+            if (Math.abs(cameraRotationAngle) == Math.abs(getDeviationAngle()))
                 deviateUp = true;
 
         }
     }
 
-    @Override
-    public void beginContact(Contact contact) {
-//        gameData.getGame().setScreen(new GameOverScreen(gameData, true));
-    }
-
-    @Override
-    public void endContact(Contact contact) {
-
-    }
-
-    @Override
-    public void preSolve(Contact contact, Manifold oldManifold) {
-
-    }
-
-    @Override
-    public void postSolve(Contact contact, ContactImpulse impulse) {
-
-    }
 }

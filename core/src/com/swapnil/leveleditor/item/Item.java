@@ -60,4 +60,6 @@ public abstract class Item {
     public abstract void updateEditor();
 
     public abstract void updatePlay();
+
+    public abstract void beginContactWith(Item itemB);
 }
