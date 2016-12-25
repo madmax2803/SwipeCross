@@ -103,13 +103,13 @@ public class PlayScreen implements Screen, InputProcessor {
     private void addBoundaryWalls() {
         Wall lower, left, right, upper;
 
-        lower = new Wall(0, 0, Gdx.graphics.getWidth(), 1, 0f);
+        lower = new Wall(0, 0, Gdx.graphics.getWidth()*PIXELS_TO_METRES, 1, 0f);
 
-        left = new Wall(0, 0, Gdx.graphics.getHeight(), 1, 90f);
+        left = new Wall(0, 0, 1, Gdx.graphics.getHeight()*PIXELS_TO_METRES, 0f);
 
-        upper = new Wall(Gdx.graphics.getHeight(), 0, Gdx.graphics.getWidth(), 1, 0f);
+        upper = new Wall(0, Gdx.graphics.getHeight(), Gdx.graphics.getWidth()*PIXELS_TO_METRES, 1, 0f);
 
-        right = new Wall(0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), 1, 90f);
+        right = new Wall(Gdx.graphics.getWidth(), 0, 1, Gdx.graphics.getHeight()*PIXELS_TO_METRES, 0f);
 
         lower.createBody(world);
         left.createBody(world);
@@ -202,7 +202,7 @@ public class PlayScreen implements Screen, InputProcessor {
             trajectoryRay.end();
         }
 
-        debugRenderer.render(world, matrix4);
+//        debugRenderer.render(world, matrix4);
     }
 
     @Override
@@ -295,3 +295,4 @@ public class PlayScreen implements Screen, InputProcessor {
         return false;
     }
 }
+

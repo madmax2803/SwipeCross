@@ -218,7 +218,7 @@ public class Camera extends Item {
     @Override
     public void beginContactWith(Item itemB) {
         if (itemB.getClass() == Player.class) {
-            //TODO Colour change code
+            System.out.println("Player Camera Collision");
         }
         else {
             //TODO other fixture combinations

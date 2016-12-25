@@ -179,7 +179,7 @@ public class Wall extends Item{
     @Override
     public void beginContactWith(Item itemB) {
         if(itemB.getClass() == Player.class) {
-            //DO NOTHING
+            System.out.println("Player Wall Collision" );
         }
 
     }

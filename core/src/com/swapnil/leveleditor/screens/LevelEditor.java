@@ -296,6 +296,7 @@ public class LevelEditor implements InputProcessor, Screen {
 		stage.addActor(menu);
 		stage.addActor(itemMenu);
 		stage.addActor(commonMenu.getMenu());
+		stage.setDebugAll(true);
 
 		stage.getRoot().addCaptureListener(new InputListener() {
 			public boolean touchDown (InputEvent event, float x, float y, int pointer, int button) {
