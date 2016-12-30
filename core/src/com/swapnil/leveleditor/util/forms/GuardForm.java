@@ -30,6 +30,7 @@ public class GuardForm {
 
         List<String> list1 = new List<>(skin);
         list1.setItems("x1", "y1");
+        list1.setColor(0, 1, 0, 0.3f);
 
         List<String> list2 = new List<>(skin);
         list2.setItems("x2", "y2");
@@ -57,13 +58,12 @@ public class GuardForm {
         x1Field.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                list1.setSelectedIndex(0);
+                list2.setSelectedIndex(0);
                 try {
                     float x1Parsed = Float.parseFloat(x1Field.getText());
-                } catch (NumberFormatException e) {
+                }catch (NumberFormatException e) {
                     //DO NOTHING
                 }
-
             }
         });
         y1Field.addListener(new ChangeListener() {
@@ -106,12 +106,12 @@ public class GuardForm {
         textFieldTable1.pack();
 
         Table textFieldTable2 = new Table();
-        textFieldTable2.add(x1Field).row();
-        textFieldTable2.add(y1Field).row();
+        textFieldTable2.add(x2Field).row();
+        textFieldTable2.add(y2Field).row();
         textFieldTable2.pack();
 
         specMenu.add(list1);
-        specMenu.add(textFieldTable1);
+        specMenu.add(textFieldTable1).row();
         specMenu.add(list2);
         specMenu.add(textFieldTable2).row();
         specMenu.add(move).colspan(4);

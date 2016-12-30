@@ -9,6 +9,6 @@ public class SwipeCross extends Game {
 	@Override
 	public void create() {
 		GameData gameData = new GameData("LevelLayoutTemp.xml", this);
-		setScreen(new PlayScreen(gameData));
+		setScreen(new LevelEditor(gameData));
 	}
 }

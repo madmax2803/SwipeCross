@@ -171,6 +171,9 @@ public class Player extends Item {
         if(itemB.getClass()==Camera.class) {
             gameData.getGame().setScreen(new GameOverScreen(gameData, false));
         }
+        else if(itemB.getClass() == Guard.class) {
+            gameData.getGame().setScreen(new GameOverScreen(gameData, false));
+        }
         else if(itemB.getClass() == Destination.class) {
             gameData.getGame().setScreen(new GameOverScreen(gameData, true));
         }

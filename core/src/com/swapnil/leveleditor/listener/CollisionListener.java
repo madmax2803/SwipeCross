@@ -6,9 +6,6 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.swapnil.leveleditor.item.Item;
 
-/**
- * Created by Home on 14-12-2016.
- */
 public class CollisionListener implements ContactListener {
     @Override
     public void beginContact(Contact contact) {

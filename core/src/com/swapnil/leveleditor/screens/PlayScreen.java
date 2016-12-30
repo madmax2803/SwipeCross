@@ -1,9 +1,6 @@
 package com.swapnil.leveleditor.screens;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -22,12 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
-import com.sun.org.apache.bcel.internal.generic.FLOAD;
 import com.swapnil.leveleditor.GameData;
-import com.swapnil.leveleditor.SwipeCross;
 import com.swapnil.leveleditor.item.*;
 import com.swapnil.leveleditor.listener.CollisionListener;
-import com.swapnil.leveleditor.util.Boundary;
 
 import java.io.IOException;
 
@@ -134,7 +128,6 @@ public class PlayScreen implements Screen, InputProcessor {
 
         world = new World(new Vector2(0f, 0f), true);
 
-        //new Boundary(PIXELS_TO_METRES,world);
         addBoundaryWalls();
 
         callback = (fixture, point, normal1, fraction) -> {
@@ -147,16 +140,6 @@ public class PlayScreen implements Screen, InputProcessor {
             return fraction;
         };
 
-        TextButton editor = new TextButton("Editor", skin);
-        editor.setPosition(0, Gdx.graphics.getHeight() - editor.getHeight());
-        textField.setPosition(editor.getX() + editor.getWidth(), editor.getY());
-        editor.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                gameData.getGame().setScreen(new LevelEditor(gameData));
-            }
-        });
-
         for(int i=0;i<itemList.size;i++) {
             itemList.get(i).createBody(world);
         }
@@ -164,7 +147,6 @@ public class PlayScreen implements Screen, InputProcessor {
         matrix4 = stage.getBatch().getProjectionMatrix().cpy().scale(PIXELS_TO_METRES, PIXELS_TO_METRES, 0);
         debugRenderer = new Box2DDebugRenderer();
 
-        stage.addActor(editor);
         stage.addActor(textField);
 
     }
@@ -237,6 +219,9 @@ public class PlayScreen implements Screen, InputProcessor {
 
     @Override
     public boolean keyDown(int keycode) {
+        if(keycode == Input.Keys.ENTER) {
+            gameData.getGame().setScreen(new LevelEditor(gameData));
+        }
         return false;
     }
 

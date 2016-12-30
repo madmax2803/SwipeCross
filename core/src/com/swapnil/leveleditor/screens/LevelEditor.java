@@ -15,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.XmlReader;
 import com.swapnil.leveleditor.GameData;
-import com.swapnil.leveleditor.SwipeCross;
 import com.swapnil.leveleditor.item.*;
 import com.swapnil.leveleditor.listener.SaveListener;
 import com.swapnil.leveleditor.tool.DeleteTool;
@@ -129,7 +128,7 @@ public class LevelEditor implements InputProcessor, Screen {
 	}
 
 
-	public void setActiveTool(Tool tool) {
+	private void setActiveTool(Tool tool) {
 		activeTool = tool;
 	}
 
@@ -282,17 +281,6 @@ public class LevelEditor implements InputProcessor, Screen {
 			}
 		});
 
-		TextButton play = new TextButton("Play", skin);
-		play.setPosition(0, Gdx.graphics.getHeight() - play.getHeight());
-		play.addListener(new ChangeListener() {
-			@Override
-			public void changed(ChangeEvent event, Actor actor) {
-				gameData.getGame().setScreen(new PlayScreen(gameData));
-			}
-		});
-
-
-		stage.addActor(play);
 		stage.addActor(menu);
 		stage.addActor(itemMenu);
 		stage.addActor(commonMenu.getMenu());
@@ -349,12 +337,15 @@ public class LevelEditor implements InputProcessor, Screen {
 					break;
 			}
 		}
-		else if(keycode == Input.Keys.SPACE || keycode == Input.Keys.MENU)
+		else if(keycode == Input.Keys.SPACE || keycode == Input.Keys.MENU) {
 			itemMenu.setVisible(!itemMenu.isVisible());
-		else if(keycode == Input.Keys.VOLUME_UP)
+		} else if(keycode == Input.Keys.VOLUME_UP) {
 			scrolled(1);
-		else if(keycode == Input.Keys.VOLUME_DOWN)
+		} else if(keycode == Input.Keys.VOLUME_DOWN) {
 			scrolled(-1);
+		} else if(keycode == Input.Keys.ENTER) {
+			gameData.getGame().setScreen(new PlayScreen(gameData));
+		}
 		return false;
 	}
 
@@ -382,8 +373,14 @@ public class LevelEditor implements InputProcessor, Screen {
 			menu.setVisible(false);
 			activeTool.onPress(screenX, screenY);
 
+		} else try {
+			if (button == Input.Buttons.MIDDLE && getSelectedItem().getClass() == Guard.class) {
+				System.out.println("Middle mouse pressed");
+				((Guard) getSelectedItem()).addPoint(screenX, screenY);
+			}
+		} catch (NullPointerException e) {
+			//DO NOTHING
 		}
-
 		return false;
 	}
 

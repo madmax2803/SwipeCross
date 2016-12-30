@@ -19,7 +19,7 @@ public class SelectTool extends Tool {
         boolean flag = true;
         for (int i = 0; i < itemArray.size; i++) {
             temp = itemArray.get(i);
-            if (temp.contains(screenX, Gdx.graphics.getHeight() -  screenY)) {
+            if (temp.contains(screenX,Gdx.graphics.getHeight() - screenY)) {
                 flag = true;
                 try {
                     levelEditor.getSelectedItem().getForm().setVisible(false);
