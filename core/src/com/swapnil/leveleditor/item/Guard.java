@@ -29,6 +29,7 @@ public class Guard extends Item {
 
     private boolean move;
     private boolean isPlaying = true;
+    private boolean width = Gdx.graphics.isFullscreen();
 
     public void setPlaying(boolean playing) {
         isPlaying = playing;
