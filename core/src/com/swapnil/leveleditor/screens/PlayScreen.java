@@ -184,7 +184,7 @@ public class PlayScreen implements Screen, InputProcessor {
             trajectoryRay.end();
         }
 
-//        debugRenderer.render(world, matrix4);
+        debugRenderer.render(world, matrix4);
     }
 
     @Override
